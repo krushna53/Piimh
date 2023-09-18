@@ -109,6 +109,37 @@ h2 {
   text-transform: uppercase;
   letter-spacing: 2px;
 }
+.footer{
+  padding: 50px 0px;
+}
+.footer_container{
+  max-width: 100%;
+  width: 90%;
+  margin: auto;
+}
+.footer_title h2{
+  color:#F37042;;
+  font-family: "Merriweather", Sans-serif;
+  font-size: 32px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-align:  center;
+}
+.footer .policies {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+    margin: 20px 0px;
+}
+.footer button {
+  box-sizing: border-box;
+    border:none;
+    padding: 12px 24px;
+    background-color: #818a91;
+    border-radius: 3px;
+    color: #ffff;
+    font-size: 15px
+}
 
 /* Mobile menu styles */
 @media (max-width: 768px) {
@@ -142,5 +173,11 @@ h2 {
   nav ul li {
     margin-right: 0;
     margin-bottom: 10px;
+  }
+  .footer .policies{
+    grid-template-columns: none;
+  }
+  .footer button{
+    margin: 10px 0px;
   }
 }
