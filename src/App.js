@@ -8,11 +8,13 @@ import Contact from "./Pages/Contact";
 import BasicPage from "./Pages/BasicPage";
 import Header from "./Components/Header";
 import Banner from "./Components/Banner";
+import Footer from "./Components/Footer";
 function App() {
   return (
     <>
     <Header/>
     <Banner/>
+    
       <Routes>
         <Route exact path='/' element={<Home />} />
         <Route exact path='/aboutus' element={<AboutUs />} />
@@ -21,6 +23,7 @@ function App() {
         <Route exact path='/contact' element={<Contact />} />
         <Route exact path='/page/:slug' element={<BasicPage />} />
       </Routes>
+      <Footer/>
     </>
   );
 }
