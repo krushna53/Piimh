@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import client from "../client";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
+import Banner from "../Components/Banner";
 
 const BasicPage = () => {
   const { slug } = useParams();
@@ -41,6 +42,7 @@ const BasicPage = () => {
                     <div className="basicPage_content">{richTextContent}</div>
                   </div>
                 </div>
+                <Banner />
               </React.Fragment>
             );
           })}
