@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import client from "../client";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
+import Banner from "../Components/Banner";
 
 const BasicPage = () => {
   const { slug } = useParams();
@@ -28,25 +29,24 @@ const BasicPage = () => {
     <>
       <section className="basicpage_main">
         <div className="container">
-          
-            {entry.map((item) => {
-              const { title, description, subTitle } = item.fields;
-              const id = item.sys.id;
-              const richTextContent = documentToReactComponents(description);
-              return (
-                <React.Fragment key={id}>
-                  <div className="basicPage">
-                    <div className="basicPage_wrapper">
-                      <h2>{title}</h2>
-                      <h3>{subTitle}</h3>
-                      <div className="basicPage_content">{richTextContent}</div>
-                    </div>
+          {entry.map((item) => {
+            const { title, description, subTitle } = item.fields;
+            const id = item.sys.id;
+            const richTextContent = documentToReactComponents(description);
+            return (
+              <React.Fragment key={id}>
+                <div className="basicPage">
+                  <div className="basicPage_wrapper">
+                    <h2>{title}</h2>
+                    <h3>{subTitle}</h3>
+                    <div className="basicPage_content">{richTextContent}</div>
                   </div>
-                </React.Fragment>
-              );
-            })}
-          </div>
-      
+                </div>
+                <Banner />
+              </React.Fragment>
+            );
+          })}
+        </div>
       </section>
     </>
   );

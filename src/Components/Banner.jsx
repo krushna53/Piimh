@@ -9,14 +9,17 @@ const Banner = () => {
   const [backgroundImage, setBackgroundImage] = useState("");
   const { slug } = useParams();
 
-  useEffect(() => {
+
+ useEffect(() => {
     async function getMenuItems() {
       try {
+  
         const entries = await client.getEntries({
           content_type: "bannerSection",
-          "fields.slug": slug,
+          "sys.id": '4hURH4J5WPqHSjm3vABwxo',
         });
         setBannerItems(entries.items.reverse());
+        console.log(entries)
         setBackgroundImage(
           entries.items[0]?.fields.backgroundImage?.fields.file.url || ""
         );
@@ -61,7 +64,7 @@ const Banner = () => {
                 const altText = description || title || "Image";
                 return (
                   <div className="custom-rich-text-block">
-                    <img src={imageUrl} alt={altText} />
+                    <img src={imageUrl} alt={altText} loading="lazy" />
                   </div>
                 );
               },
@@ -73,12 +76,13 @@ const Banner = () => {
     return null;
   };
 
+
   return (
     <section
       className="banner"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-<div className="background-overlay"></div>
+      <div className="background-overlay"></div>
       <div className="container">
         {bannerItems.map((item) => (
           <React.Fragment key={item.sys.id}>
