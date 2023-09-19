@@ -5,6 +5,12 @@
   box-sizing: border-box;
 }
 
+.container {
+  max-width: 100%;
+  width: 90%;
+  margin: auto;
+}
+
 /* Header styles */
 header {
   background-color: #fff;
@@ -93,7 +99,7 @@ nav ul li a:hover {
   position: absolute;
 }
 
-h1 {
+.custom-rich-text-heading h1 {
   color: #ffffff;
   font-family: "Lato", Sans-serif;
   font-size: 66px;
@@ -101,7 +107,7 @@ h1 {
   letter-spacing: -1px;
 }
 
-h2 {
+.custom-rich-text-subheading h2 {
   color: #ffffff;
   font-family: "Merriweather", Sans-serif;
   font-size: 22px;
@@ -109,36 +115,42 @@ h2 {
   text-transform: uppercase;
   letter-spacing: 2px;
 }
-.footer{
+
+.footer {
   padding: 50px 0px;
 }
-.footer_container{
+
+.footer_container {
   max-width: 100%;
   width: 90%;
   margin: auto;
 }
-.footer_title h2{
-  color:#F37042;;
+
+.footer_title h2 {
+  color: #F37042;
+  ;
   font-family: "Merriweather", Sans-serif;
   font-size: 32px;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 2px;
-  text-align:  center;
+  text-align: center;
 }
+
 .footer .policies {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-    margin: 20px 0px;
+  margin: 20px 0px;
 }
+
 .footer button {
   box-sizing: border-box;
-    border:none;
-    padding: 12px 24px;
-    background-color: #818a91;
-    border-radius: 3px;
-    color: #ffff;
-    font-size: 15px
+  border: none;
+  padding: 12px 24px;
+  background-color: #818a91;
+  border-radius: 3px;
+  color: #ffff;
+  font-size: 15px
 }
 
 /* Mobile menu styles */
@@ -174,10 +186,12 @@ h2 {
     margin-right: 0;
     margin-bottom: 10px;
   }
-  .footer .policies{
+
+  .footer .policies {
     grid-template-columns: none;
   }
-  .footer button{
+
+  .footer button {
     margin: 10px 0px;
   }
 }

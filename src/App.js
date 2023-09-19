@@ -16,6 +16,7 @@ function App() {
     <Banner/>
     
       <Routes>
+      <Route exact path='/page/:slug' element={<BasicPage />} />
         <Route exact path='/' element={<Home />} />
         <Route exact path='/aboutus' element={<AboutUs />} />
         <Route exact path='/programs' element={<Programs />} />
