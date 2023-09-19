@@ -26,25 +26,27 @@ const BasicPage = () => {
 
   return (
     <>
-      <section>
+      <section className="basicpage_main">
         <div className="container">
-          {entry.map((item) => {
-            const { title, description, subTitle } = item.fields;
-            const id = item.sys.id;
-            const richTextContent = documentToReactComponents(description);
-            return (
-              <React.Fragment key={id}>
-                <div className="basicPage">
-                  <div className="basicPage_wrapper">
-                    <h2>{title}</h2>
-                    <h3>{subTitle}</h3>
-                    <div className="basicPage_content">{richTextContent}</div>
+          
+            {entry.map((item) => {
+              const { title, description, subTitle } = item.fields;
+              const id = item.sys.id;
+              const richTextContent = documentToReactComponents(description);
+              return (
+                <React.Fragment key={id}>
+                  <div className="basicPage">
+                    <div className="basicPage_wrapper">
+                      <h2>{title}</h2>
+                      <h3>{subTitle}</h3>
+                      <div className="basicPage_content">{richTextContent}</div>
+                    </div>
                   </div>
-                </div>
-              </React.Fragment>
-            );
-          })}
-        </div>
+                </React.Fragment>
+              );
+            })}
+          </div>
+      
       </section>
     </>
   );
