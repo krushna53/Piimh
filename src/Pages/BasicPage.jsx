@@ -27,7 +27,7 @@ const BasicPage = () => {
 
   return (
     <>
-      <section>
+      <section className="basicpage_main">
         <div className="container">
           {entry.map((item) => {
             const { title, description, subTitle } = item.fields;
