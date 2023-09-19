@@ -1,5 +1,7 @@
 import React ,{ useEffect } from  "react";
 import Aos from "aos";
+
+import { Link } from "react-router-dom";
 const Footer = () => {
   useEffect(() => {
     Aos.init({ duration: 2000 });
@@ -11,23 +13,22 @@ const Footer = () => {
           <div className="footer_title">
             <h2 data-aos="fade-right" data-aos-offset="200">Policies</h2>
           </div>
-
           <div className="policies">
-            <a href="https://piimh.com/termsofservice/" target="_blank">
-              <button>
+            <button>
+              <Link to="/page/terms-of-service">
                 <span>Terms Of Service</span>
-              </button>
-            </a>
-            <a href="https://piimh.com/termsofservice/" target="_blank">
-              <button>
+              </Link>
+            </button>
+            <button>
+              <Link to="/page/privacy-statement">
                 <span>Privacy Statement</span>
-              </button>
-            </a>
-            <a href="https://piimh.com/termsofservice/" target="_blank">
-              <button>
+              </Link>
+            </button>
+            <button>
+              <Link to="/page/refunds">
                 <span>Refunds</span>
-              </button>
-            </a>
+              </Link>
+            </button>
           </div>
         </div>
       </div>
