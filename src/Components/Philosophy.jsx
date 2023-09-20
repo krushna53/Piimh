@@ -35,18 +35,18 @@ const Philosophy = () => {
           const richTextContent = documentToReactComponents(description);
           return (
             <React.Fragment key={id}>
-              <div className="basicComponent">
-                <div className="container">
-                  <div className="basicComponent_wrapper">
-                    <div>
+              <div className="container">
+                <div className="basicComponent">
+                  <div className="title_sub_title">
+                    <h3>{subTitle}</h3>
+                    <h2 className="heading-title">{title}</h2>
+                  </div>
+                  <div className="basicComponent_wrapper d-flex">
+                    <div className="Right_img">
                       <img src={imageUrl} alt={title} width={100} />
                     </div>
-                    <div>
-                      <h3>{subTitle}</h3>
-                      <h2>{title}</h2>
-                      <div className="basicComponent_content">
-                        {richTextContent}
-                      </div>
+                    <div className="basicComponent_content">
+                      {richTextContent}
                     </div>
                   </div>
                 </div>

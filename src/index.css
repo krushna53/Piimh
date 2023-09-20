@@ -18,7 +18,7 @@ header {
   width: 100%;
 }
 
-.container {
+.d-flex {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -112,20 +112,23 @@ nav ul li a:hover {
   letter-spacing: 2px;
 }
 
-.contact_us h2{
+.contact_us h2 {
   color: #F37042;
-    font-family: "Merriweather", Sans-serif;
-    font-size: 32px;
-    font-weight: bold;
-    text-align: center;
+  font-family: "Merriweather", Sans-serif;
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center;
 }
-form{
+
+form {
   padding: 0px 50px;
   font-weight: bold;
 }
-.form-container{
+
+.form-container {
   padding: 50px 0px;
 }
+
 form .d-flex {
   display: flex;
   justify-content: space-between;
@@ -133,7 +136,8 @@ form .d-flex {
   margin: auto;
   gap: 5%;
 }
-.input-field .frist .last{
+
+.input-field .frist .last {
   font-size: 14px;
   font-weight: 400;
 }
@@ -143,8 +147,9 @@ form .d-flex {
   margin: 40px 0;
   width: 100%;
 }
+
 .input-field span,
-.text-area  span{
+.text-area span {
   color: red;
 }
 
@@ -156,14 +161,14 @@ form .d-flex {
   margin: 11px 0;
   display: block;
 }
- .frist .last{
+
+.frist .last {
   font-size: 14.60px;
   font-weight: 400;
 }
 
 .input-field input,
-.text-area textarea
- {
+.text-area textarea {
   line-height: 23px;
   height: 35px;
   /* border: none; */
@@ -194,35 +199,74 @@ form .d-flex {
   box-sizing: border-box !important;
   color: #333;
   font-size: 16px;
-  background:#eee;
-}
-.basicpage_main{
-  background-color: #FEF5F5;
-    padding: 50px 0px;
-}
-.basicPage{
-  width: 70%;
-    margin: auto;
-    padding: 50px 30px;
-    background-color: #fff;
-    box-shadow: 20px 20px 80px 0px rgba(0,0,0,0.1);
+  background: #eee;
 }
 
-.basicPage_wrapper h2{
-  text-align: center;
-    font-size: 14px;
-    font-weight: 400;
-    margin-bottom: 20px;
+.basicpage_main {
+  background-color: #FEF5F5;
+  padding: 50px 0px;
 }
-.basicPage_wrapper h3{
+
+.basicPage {
+  width: 70%;
+  margin: auto;
+  padding: 50px 30px;
+  background-color: #fff;
+  box-shadow: 20px 20px 80px 0px rgba(0, 0, 0, 0.1);
+}
+
+.basicPage_wrapper h2 {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 20px;
+}
+
+.basicPage_wrapper h3 {
   font-size: 14px;
   font-weight: 400;
 }
-.basicPage_content p{
+
+.basicPage_content p {
   text-align: justify;
-  padding:20px 0px;
+  padding: 20px 0px;
 
 }
+
+/* for philosophy css  */
+section.philosophy {
+  padding: 50px 0;
+}
+
+.philosophy .Right_img {
+  width: 32.30%;
+}
+
+.philosophy .basicComponent_content {
+  width: 50.60%;
+}
+
+.philosophy .Right_img img {
+  width: 100%;
+}
+
+.philosophy .heading-title {
+  color: #00A878;
+  font-family: "Lato", Sans-serif;
+  font-size: 3.8em;
+  font-weight: 600;
+  -webkit-text-stroke-color: #000;
+  stroke: #000;
+}
+.philosophy h3{color: #F37042;
+    font-family: "Merriweather", Sans-serif;
+    font-size: 0.87em;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    -webkit-text-stroke-color: #000;
+    stroke: #000;
+  }
 .footer {
   padding: 50px 0px;
 }
@@ -242,6 +286,7 @@ form .d-flex {
   letter-spacing: 2px;
   text-align: center;
 }
+
 .footer .policies {
   max-width: 100%;
   width: 90%;
@@ -261,6 +306,7 @@ form .d-flex {
   border-radius: 3px;
   margin: auto;
 }
+
 .footer button a {
   color: #ffff;
   font-size: 15px;

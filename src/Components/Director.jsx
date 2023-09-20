@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import client from "../client";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 
-const PhilosophyProgram = () => {
+const Director = () => {
   const { slug } = useParams();
   const [entry, setEntry] = useState([]);
 
@@ -12,7 +12,7 @@ const PhilosophyProgram = () => {
       try {
         const response = await client.getEntries({
           content_type: "component",
-          "sys.id": "wDrTLBLEbCgDDSbIZGx15",
+          "sys.id": "2Aq8vl8W4kEQtRerKjccgg",
         });
         console.log(response);
         if (response.items.length) {
@@ -27,20 +27,15 @@ const PhilosophyProgram = () => {
 
   return (
     <>
-      <section className="philosophy-program">
+      <section className="director">
         {entry.map((item) => {
           const { title, description, subTitle, ctaButton, link } = item.fields;
-          const bgImage = item.fields.bgImage.fields.file.url;
+          const imageUrl = item.fields.image.fields.file.url;
           const id = item.sys.id;
           const richTextContent = documentToReactComponents(description);
-
-          const sectionStyle = {
-            backgroundImage: `url(${bgImage})`, // Set background image using the backgroundImage CSS property
-          };
-
           return (
             <React.Fragment key={id}>
-              <div className="basicComponent" style={sectionStyle}>
+              <div className="basicComponent">
                 <div className="container">
                   <div className="basicComponent_wrapper">
                     <div>
@@ -48,10 +43,13 @@ const PhilosophyProgram = () => {
                       <h2>{title}</h2>
                       <div className="basicComponent_content">
                         {richTextContent}
+                        <a href={link} className="cta-button">
+                          {ctaButton}
+                        </a>
                       </div>
-                      <a href={link} className="cta-button">
-                        {ctaButton}
-                      </a>
+                    </div>
+                    <div>
+                      <img src={imageUrl} alt={title} width={100} />
                     </div>
                   </div>
                 </div>
@@ -64,4 +62,4 @@ const PhilosophyProgram = () => {
   );
 };
 
-export default PhilosophyProgram;
+export default Director;

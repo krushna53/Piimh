@@ -84,11 +84,13 @@ const Banner = () => {
     >
       <div className="background-overlay"></div>
       <div className="container">
+      <div className="d-flex">
         {bannerItems.map((item) => (
           <React.Fragment key={item.sys.id}>
             {renderRichText(item.fields.description)}
           </React.Fragment>
         ))}
+      </div>
       </div>
     </section>
   );

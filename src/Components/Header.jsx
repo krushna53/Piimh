@@ -22,35 +22,36 @@ const Header = () => {
   };
 
   return (
-  <>
-  <header>
-    <div className="container">
-      <div className="logo">
-        <img src="logo.png" alt="Logo" />
-      </div>
-      <div className="humber_menu" onClick={toggleMenu}>
-        <i className="fas fa-bars"></i>
-      </div>
-      <nav className={isMenuOpen ? "open" : ""}>
-        <ul>
-          {menuItems.map((items) => (
-            <li key={items.sys.id}>
-              <NavLink
-                to={items.fields.link}
-                className={
-                  location.pathname === items.fields.link ? "active" : ""
-                }
-              >
-                {items.fields.name}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </div>
-    </header>
-
-  </>
+    <>
+      <header>
+        <div className="container">
+          <div className="d-flex">
+            <div className="logo">
+              <img src="logo.png" alt="Logo" />
+            </div>
+            <div className="humber_menu" onClick={toggleMenu}>
+              <i className="fas fa-bars"></i>
+            </div>
+            <nav className={isMenuOpen ? "open" : ""}>
+              <ul>
+                {menuItems.map((items) => (
+                  <li key={items.sys.id}>
+                    <NavLink
+                      to={items.fields.link}
+                      className={
+                        location.pathname === items.fields.link ? "active" : ""
+                      }
+                    >
+                      {items.fields.name}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </header>
+    </>
   );
 };
 
