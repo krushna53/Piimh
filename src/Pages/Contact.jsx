@@ -10,7 +10,9 @@ const Contact = () => {
         <form>
           <div className="d-flex">
             <div className="input-field">
-              <label htmlFor="name">Your Name <span>*</span></label>
+              <label htmlFor="name">
+                Your Name <span>*</span>
+              </label>
               <input
                 type="text"
                 id="name"
@@ -19,10 +21,12 @@ const Contact = () => {
                 // onChange={(e) => setName(e.target.value)}
                 required
               />
-              <label className="frist" htmlFor="name">Frist</label>
+             
             </div>
             <div className="input-field">
-            <label htmlFor="name"> </label>
+              <label htmlFor="email">
+                Your Email <span>*</span>{" "}
+              </label>
               <input
                 type="email"
                 name="email"
@@ -31,23 +35,13 @@ const Contact = () => {
                 // onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              <label className="last" htmlFor="name">Last</label>
             </div>
           </div>
-          <div className="input-field">
-              <label htmlFor="email">Your Email <span>*</span> </label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                // value={email}
-                // onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
 
           <div className="text-area">
-            <label htmlFor="message">Comment or Message <span>*</span></label>
+            <label htmlFor="message">
+              Comment or Message <span>*</span>
+            </label>
             <textarea
               name="message"
               id="message"
