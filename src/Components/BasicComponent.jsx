@@ -26,7 +26,7 @@ const BasicComponent = () => {
 
   return (
     <>
-      <section>
+      <section className="Home-about">
         {entry.map((item) => {
           const { title, description, subTitle, bgColor, ctaButton, link } =
             item.fields;

@@ -1,6 +1,6 @@
 import React from "react";
 // import Banner from "../Components/Banner";
-// import BasicComponent from "../Components/BasicComponent";
+import BasicComponent from "../Components/BasicComponent";
 import Philosophy from "../Components/Philosophy";
 // import PhilosophyProgram from "../Components/PhilosophyProgram";
 // import Director from "../Components/Director";
@@ -11,7 +11,7 @@ const Home = () => {
   return (
     <>
       {/* <Banner slug={id} /> */}
-      {/* <BasicComponent/> */}
+      <BasicComponent/>
       <Philosophy/>
       {/* <PhilosophyProgram/> */}
       {/* <Director/> */}

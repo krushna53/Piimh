@@ -4,7 +4,7 @@ import Aos from "aos";
 import { Link } from "react-router-dom";
 const Footer = () => {
   useEffect(() => {
-    Aos.init({ duration: 2000 });
+    Aos.init({ duration: 1000 });
   });
   return (
     <>
