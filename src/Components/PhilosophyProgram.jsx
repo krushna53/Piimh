@@ -48,6 +48,7 @@ const PhilosophyProgram = () => {
                       <h2>{title}</h2>
                       <div className="basicComponent_content">
                         {richTextContent}
+                        
                       </div>
                       <a href={link} className="cta-button">
                         {ctaButton}

@@ -111,24 +111,70 @@ nav ul li a:hover {
   text-transform: uppercase;
   letter-spacing: 2px;
 }
+.basicComponent {
+  padding: 50px 0px;
+}
+.basicComponent .basicComponent_wrapper h2 {
+  color: #f37042;
+  font-family: "Lato", Sans-serif;
+  font-size: 60px;
+  font-weight: 600;
+
+  letter-spacing: 3.8px;
+  text-align: center;
+}
+.basicComponent .basicComponent_wrapper h3 {
+  text-align: center;
+  font-weight: 300;
+  font-size: 24px;
+  color: #00a878;
+}
+.basicComponent .basicComponent_content {
+  background-color: #fff;
+  box-shadow: 20px 20px 80px 0px rgba(0, 0, 0, 0.1);
+  padding: 20px 15px;
+  text-align: justify;
+  width: 70%;
+  margin: auto;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.cta-button {
+  border: none;
+  padding: 10px 25px;
+  background-color: #f37042;
+  border-radius: 15px;
+  margin: auto;
+  font-size: 17px;
+  text-decoration: none;
+  text-transform: uppercase;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease-in;
+}
+.cta-button:hover {
+  background-color: #00a878;
+  transform: scale(1.2);
+}
 
 .contact_us h2 {
-  color: #F37042;
+  color: #f37042;
   font-family: "Merriweather", Sans-serif;
   font-size: 32px;
   font-weight: bold;
   text-align: center;
 }
-
 form {
   padding: 0px 50px;
   font-weight: bold;
 }
-
 .form-container {
   padding: 50px 0px;
 }
-
 form .d-flex {
   display: flex;
   justify-content: space-between;
@@ -137,17 +183,10 @@ form .d-flex {
   gap: 5%;
 }
 
-.input-field .frist .last {
-  font-size: 14px;
-  font-weight: 400;
-}
-
-
 .input-field {
   margin: 40px 0;
   width: 100%;
 }
-
 .input-field span,
 .text-area span {
   color: red;
@@ -161,9 +200,8 @@ form .d-flex {
   margin: 11px 0;
   display: block;
 }
-
 .frist .last {
-  font-size: 14.60px;
+  font-size: 14.6px;
   font-weight: 400;
 }
 
@@ -186,7 +224,6 @@ form .d-flex {
 .text-area textarea {
   min-height: 146px;
   resize: vertical;
-
 }
 
 .submit_btn {
@@ -201,12 +238,10 @@ form .d-flex {
   font-size: 16px;
   background: #eee;
 }
-
 .basicpage_main {
-  background-color: #FEF5F5;
+  background-color: #fef5f5;
   padding: 50px 0px;
 }
-
 .basicPage {
   width: 70%;
   margin: auto;
@@ -221,16 +256,13 @@ form .d-flex {
   font-weight: 400;
   margin-bottom: 20px;
 }
-
 .basicPage_wrapper h3 {
   font-size: 14px;
   font-weight: 400;
 }
-
 .basicPage_content p {
   text-align: justify;
   padding: 20px 0px;
-
 }
 
 /* for philosophy css  */
@@ -267,6 +299,7 @@ section.philosophy {
     -webkit-text-stroke-color: #000;
     stroke: #000;
   }
+
 .footer {
   padding: 50px 0px;
 }
@@ -286,7 +319,6 @@ section.philosophy {
   letter-spacing: 2px;
   text-align: center;
 }
-
 .footer .policies {
   max-width: 100%;
   width: 90%;
@@ -306,13 +338,11 @@ section.philosophy {
   border-radius: 3px;
   margin: auto;
 }
-
 .footer button a {
   color: #ffff;
   font-size: 15px;
   text-decoration: none;
 }
-
 
 /* Mobile menu styles */
 @media (max-width: 768px) {
