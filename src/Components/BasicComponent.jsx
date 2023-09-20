@@ -45,10 +45,11 @@ const BasicComponent = () => {
                     <h3>{subTitle}</h3>
                     <div className="basicComponent_content">
                       {richTextContent}
-                    </div>
-                    <a href={link} className="cta-button">
+                      <a href={link} className="cta-button">
                       {ctaButton}
                     </a>
+                    </div>
+                    
                   </div>
                 </div>
               </div>
