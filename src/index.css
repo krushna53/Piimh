@@ -18,7 +18,7 @@ header {
   width: 100%;
 }
 
-.container {
+.d-flex {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -264,6 +264,42 @@ form .d-flex {
   text-align: justify;
   padding: 20px 0px;
 }
+
+/* for philosophy css  */
+section.philosophy {
+  padding: 50px 0;
+}
+
+.philosophy .Right_img {
+  width: 32.30%;
+}
+
+.philosophy .basicComponent_content {
+  width: 50.60%;
+}
+
+.philosophy .Right_img img {
+  width: 100%;
+}
+
+.philosophy .heading-title {
+  color: #00A878;
+  font-family: "Lato", Sans-serif;
+  font-size: 3.8em;
+  font-weight: 600;
+  -webkit-text-stroke-color: #000;
+  stroke: #000;
+}
+.philosophy h3{color: #F37042;
+    font-family: "Merriweather", Sans-serif;
+    font-size: 0.87em;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    -webkit-text-stroke-color: #000;
+    stroke: #000;
+  }
+
 .footer {
   padding: 50px 0px;
 }

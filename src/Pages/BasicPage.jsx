@@ -42,7 +42,7 @@ const BasicPage = () => {
                     <div className="basicPage_content">{richTextContent}</div>
                   </div>
                 </div>
-                <Banner />
+                {/* <Banner /> */}
               </React.Fragment>
             );
           })}

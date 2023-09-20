@@ -7,22 +7,20 @@ import Publication from "./Pages/Publication";
 import Contact from "./Pages/Contact";
 import BasicPage from "./Pages/BasicPage";
 import Header from "./Components/Header";
-
 import Footer from "./Components/Footer";
 function App() {
   return (
     <>
-    <Header/>
+      <Header />
       <Routes>
+        <Route exact path='page/:slug' element={<BasicPage />} />
         <Route exact path='/' element={<Home />} />
-      <Route exact path='/page/:slug' element={<BasicPage />} />
         <Route exact path='/aboutus' element={<AboutUs />} />
         <Route exact path='/programs' element={<Programs />} />
         <Route exact path='/publication' element={<Publication />} />
         <Route exact path='/contact' element={<Contact />} />
-  
       </Routes>
-      <Footer/>
+      <Footer />
     </>
   );
 }

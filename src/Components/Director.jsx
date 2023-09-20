@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import client from "../client";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 
-const StayConnected = () => {
+const Director = () => {
   const { slug } = useParams();
   const [entry, setEntry] = useState([]);
 
@@ -12,7 +12,7 @@ const StayConnected = () => {
       try {
         const response = await client.getEntries({
           content_type: "component",
-          "sys.id": "44domFAPPtLBfKhcsj6tye",
+          "sys.id": "2Aq8vl8W4kEQtRerKjccgg",
         });
         console.log(response);
         if (response.items.length) {
@@ -27,13 +27,12 @@ const StayConnected = () => {
 
   return (
     <>
-      <section className="stay-connected">
+      <section className="director">
         {entry.map((item) => {
-          const { title, subTitle } = item.fields;
+          const { title, description, subTitle, ctaButton, link } = item.fields;
           const imageUrl = item.fields.image.fields.file.url;
-          const googleMapsUrl = item.fields.googleMapsUrl; // Replace with your actual field name
           const id = item.sys.id;
-
+          const richTextContent = documentToReactComponents(description);
           return (
             <React.Fragment key={id}>
               <div className="basicComponent">
@@ -43,20 +42,14 @@ const StayConnected = () => {
                       <h3>{subTitle}</h3>
                       <h2>{title}</h2>
                       <div className="basicComponent_content">
-                        <div>
-                          {/* Manually create and render the Google Maps iframe */}
-                          <iframe
-                            src={googleMapsUrl}
-                            width="100%"
-                            height="400"
-                            allowFullScreen
-                            title="Google Map"
-                          ></iframe>
-                        </div>
-                        <div>
-                          <img src={imageUrl} alt={title} width={100} />
-                        </div>
+                        {richTextContent}
+                        <a href={link} className="cta-button">
+                          {ctaButton}
+                        </a>
                       </div>
+                    </div>
+                    <div>
+                      <img src={imageUrl} alt={title} width={100} />
                     </div>
                   </div>
                 </div>
@@ -69,4 +62,4 @@ const StayConnected = () => {
   );
 };
 
-export default StayConnected;
+export default Director;

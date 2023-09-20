@@ -29,14 +29,18 @@ const PhilosophyProgram = () => {
     <>
       <section className="philosophy-program">
         {entry.map((item) => {
-          const { title, description, subTitle, ctaButton, link  } = item.fields;
+          const { title, description, subTitle, ctaButton, link } = item.fields;
           const bgImage = item.fields.bgImage.fields.file.url;
           const id = item.sys.id;
           const richTextContent = documentToReactComponents(description);
+
+          const sectionStyle = {
+            backgroundImage: `url(${bgImage})`, // Set background image using the backgroundImage CSS property
+          };
+
           return (
             <React.Fragment key={id}>
-              <div className="basicComponent"
-                style={{ backgroundColor: bgImage }}>
+              <div className="basicComponent" style={sectionStyle}>
                 <div className="container">
                   <div className="basicComponent_wrapper">
                     <div>
@@ -47,8 +51,8 @@ const PhilosophyProgram = () => {
                         
                       </div>
                       <a href={link} className="cta-button">
-                      {ctaButton}
-                    </a>
+                        {ctaButton}
+                      </a>
                     </div>
                   </div>
                 </div>
