@@ -8,6 +8,7 @@ import Contact from "./Pages/Contact";
 import BasicPage from "./Pages/BasicPage";
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
+import './style.css'
 function App() {
   return (
     <>

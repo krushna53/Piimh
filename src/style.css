@@ -1,0 +1,188 @@
+.banner .d-flex {
+    justify-content: end;
+}
+
+.philosophy .d-flex {
+    justify-content: center;
+    gap: 5%;
+    align-items: flex-start;
+}
+
+
+.title_sub_title {
+    text-align: end;
+    width: 80%;
+    display: block;
+    margin-top: 50px;
+}
+
+.philosophy p {
+    text-align: left;
+    padding: 5% 0;
+    font-family: "Merriweather", Sans-serif;
+    font-size: 1.2rem;
+    font-weight: 300;
+    line-height: 1.6em;
+}
+
+
+/* Adjust the background position and size */
+.philosophy-program .basicComponent {
+    background-position: center bottom;
+    background-size: cover;
+    transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+    padding: 100px 0;
+    /* Simplify padding values */
+    min-height: 800px;
+    position: relative;
+}
+
+/* Center and space the content */
+.philosophy-program .basicComponent_wrapper {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 auto;
+    /* Center the content horizontally */
+    padding: 3em;
+    position: relative;
+    gap: 5%;
+    height: 450px;
+}
+
+/* Style the heading */
+.philosophy-program .basicComponent_wrapper h2 {
+    color: #F37042;
+    font-family: "Lato", sans-serif;
+    /* Use lowercase for font family name */
+    font-size: 3.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 1em;
+    text-align: center;
+    letter-spacing: 3.8px;
+    margin: 0;
+    /* Remove default margin */
+}
+
+/* Style the paragraph text */
+.philosophy-program .basicComponent_wrapper p {
+    text-align: left;
+    /* Align text to the left */
+    font-family: "Merriweather", sans-serif;
+    /* Use lowercase for font family name */
+    font-size: 1.2rem;
+    font-weight: 300;
+    line-height: 1.6em;
+    padding: 20px 0;
+}
+
+/* Style the background overlay */
+.philosophy-program .elementor-background-overlay {
+    background-color: #00A8782B;
+    opacity: 0.47;
+    mix-blend-mode: darken;
+    transition: background 0.3s, border-radius 0.3s, opacity 0.3s;
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* Set the left position */
+    width: 100%;
+    height: 100%;
+}
+
+/* Style the additional background overlay */
+.philosophy-program .background-overlay {
+    background-color: rgba(255, 255, 255, 0.38);
+    opacity: 0.55;
+}
+
+/* Adjust content alignment */
+.philosophy-program .basicComponent_content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    /* Align content to the right */
+    gap: 4%;
+    position: relative;
+    z-index: 1;
+}
+
+
+
+/* Director Section */
+section.director {
+    padding: 70px 0px;
+    background: #fff;
+}
+
+/* Basic Component */
+.basicComponent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.title_subtitle {
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+h3 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.basicComponent_wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.basicComponent_content {
+    max-width: 600px;
+    /* Adjust the maximum width as needed */
+}
+
+a.cta-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    /* Set your desired button background color */
+    color: #fff;
+    /* Set your desired button text color */
+    text-decoration: none;
+    font-size: 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+a.cta-button:hover {
+    background-color: #0056b3;
+    /* Change the button background color on hover */
+}
+
+/* Right Image */
+.right_img {
+    margin-top: 20px;
+}
+
+.right_img img {
+    max-width: 100%;
+    /* Ensure the image doesn't exceed its container */
+    height: auto;
+}

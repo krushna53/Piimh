@@ -37,18 +37,18 @@ const Director = () => {
             <React.Fragment key={id}>
               <div className="basicComponent">
                 <div className="container">
+                  <div className="title_subtitle">
+                    <h3>{subTitle}</h3>
+                    <h2>{title}</h2>
+                  </div>
                   <div className="basicComponent_wrapper">
-                    <div>
-                      <h3>{subTitle}</h3>
-                      <h2>{title}</h2>
-                      <div className="basicComponent_content">
-                        {richTextContent}
-                        <a href={link} className="cta-button">
-                          {ctaButton}
-                        </a>
-                      </div>
+                    <div className="basicComponent_content">
+                      {richTextContent}
+                      <a href={link} className="cta-button">
+                        {ctaButton}
+                      </a>
                     </div>
-                    <div>
+                    <div className="right_img">
                       <img src={imageUrl} alt={title} width={100} />
                     </div>
                   </div>

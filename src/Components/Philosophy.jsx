@@ -25,6 +25,18 @@ const Philosophy = () => {
     fetchPage();
   }, [slug]);
 
+ const options = {
+  renderNode: {
+    'heading-3 & heading-4': (node, children) => (
+      <div>
+        <h3 className="your-h3-class">{children}</h3>
+        <h4 className="your-h4-class">{children}</h4>
+      </div>
+    ),
+  },
+};
+
+
   return (
     <>
       <section className="philosophy">
@@ -32,7 +44,7 @@ const Philosophy = () => {
           const { title, description, subTitle } = item.fields;
           const imageUrl = item.fields.image.fields.file.url;
           const id = item.sys.id;
-          const richTextContent = documentToReactComponents(description);
+          const richTextContent = documentToReactComponents(description, options);
           return (
             <React.Fragment key={id}>
               <div className="container">

@@ -29,7 +29,7 @@ const PhilosophyProgram = () => {
     <>
       <section className="philosophy-program">
         {entry.map((item) => {
-          const { title, description, subTitle, ctaButton, link } = item.fields;
+          const { title, description, ctaButton, link } = item.fields;
           const bgImage = item.fields.bgImage.fields.file.url;
           const id = item.sys.id;
           const richTextContent = documentToReactComponents(description);
@@ -41,15 +41,13 @@ const PhilosophyProgram = () => {
           return (
             <React.Fragment key={id}>
               <div className="basicComponent" style={sectionStyle}>
+                <div class="elementor-background-overlay"></div>
                 <div className="container">
                   <div className="basicComponent_wrapper">
-                    <div>
-                      <h3>{subTitle}</h3>
-                      <h2>{title}</h2>
-                      <div className="basicComponent_content">
-                        {richTextContent}
-                        
-                      </div>
+                    <div class="background-overlay"></div>
+                    <h2>{title}</h2>
+                    <div className="basicComponent_content">
+                      {richTextContent}
                       <a href={link} className="cta-button">
                         {ctaButton}
                       </a>
