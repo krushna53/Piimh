@@ -111,9 +111,13 @@ nav ul li a:hover {
   text-transform: uppercase;
   letter-spacing: 2px;
 }
+
 .Home-about .basicComponent {
   padding: 50px 0px;
+  height: 500px;
+  position: relative;
 }
+
 .Home-about .basicComponent .basicComponent_wrapper h2 {
   color: #f37042;
   font-family: "Lato", Sans-serif;
@@ -122,6 +126,7 @@ nav ul li a:hover {
   letter-spacing: 3.8px;
   text-align: center;
 }
+
 .Home-about .basicComponent .basicComponent_wrapper h3 {
   text-align: center;
   font-weight: 300;
@@ -129,32 +134,41 @@ nav ul li a:hover {
   color: #00a878;
   font-family: "Merriweather Sans", sans-serif;
   letter-spacing: 3.5px;
- 
+
 }
+
 .Home-about .basicComponent .basicComponent_content {
   background-color: #fff;
   box-shadow: 20px 20px 80px 0px rgba(0, 0, 0, 0.1);
-  padding: 20px 35px;
-  text-align: justify;
-  width: 60%;
+  width: 800px;
   margin: auto;
-  height: 300px;
+  height: 400px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  font-family: "Merriweather Sans", sans-serif;
-  font-size: 19px;
-  font-weight: 300;
- 
+  gap: 22px;
+  padding: 50px 50px 50px 50px;
+  position: absolute;
+  top: 40%;
+  left: 20%;
 }
 
-.Home-about .cta-button {
+.Home-about .basicComponent_content p {
+  line-height: 1.9;
+  font-family: "Merriweather Sans", sans-serif;
+  font-size: 19px;
+  text-align: justify;
+  font-weight: 200;
+  padding: 25px;
+  color: rgb(51, 51, 51);
+}
+
+.cta-button {
   border: none;
-  padding: 8px 25px;
+  padding: 12px 25px;
   background-color: #f37042;
   border-radius: 35px;
-  margin: auto;
   font-size: 17px;
   text-decoration: none;
   text-transform: uppercase;
@@ -162,7 +176,8 @@ nav ul li a:hover {
   cursor: pointer;
   transition: transform 0.3s ease-in;
 }
-.Home-about .cta-button:hover {
+
+.cta-button:hover {
   background-color: #00a878;
   transform: scale(0.9);
 }
@@ -192,6 +207,7 @@ form .d-flex {
   margin: 40px 0;
   width: 100%;
 }
+
 .input-field span,
 .text-area span {
   color: red;
@@ -205,6 +221,7 @@ form .d-flex {
   margin: 11px 0;
   display: block;
 }
+
 .frist .last {
   font-size: 14.6px;
   font-weight: 400;
@@ -243,10 +260,12 @@ form .d-flex {
   font-size: 16px;
   background: #eee;
 }
+
 .basicpage_main {
   background-color: #fef5f5;
   padding: 50px 0px;
 }
+
 .basicPage {
   width: 70%;
   margin: auto;
@@ -261,10 +280,12 @@ form .d-flex {
   font-weight: 400;
   margin-bottom: 20px;
 }
+
 .basicPage_wrapper h3 {
   font-size: 14px;
   font-weight: 400;
 }
+
 .basicPage_content p {
   text-align: justify;
   padding: 20px 0px;
@@ -272,15 +293,17 @@ form .d-flex {
 
 /* for philosophy css  */
 section.philosophy {
-  padding: 50px 0;
+  padding: 70px 0;
+  margin-top: 70px;
 }
 
 .philosophy .Right_img {
-  width: 32.3%;
+  width: 30%;
 }
 
 .philosophy .basicComponent_content {
-  width: 50.6%;
+  width: 34.6%;
+  margin-top: 54px;
 }
 
 .philosophy .Right_img img {
@@ -295,6 +318,7 @@ section.philosophy {
   -webkit-text-stroke-color: #000;
   stroke: #000;
 }
+
 .philosophy h3 {
   color: #f37042;
   font-family: "Merriweather", Sans-serif;
@@ -310,12 +334,6 @@ section.philosophy {
   padding: 50px 0px;
 }
 
-.footer_container {
-  max-width: 100%;
-  width: 90%;
-  margin: auto;
-}
-
 .footer_title h2 {
   color: #f37042;
   font-family: "Merriweather", Sans-serif;
@@ -325,6 +343,7 @@ section.philosophy {
   letter-spacing: 2px;
   text-align: center;
 }
+
 .footer .policies {
   max-width: 100%;
   width: 90%;
@@ -344,6 +363,7 @@ section.philosophy {
   border-radius: 3px;
   margin: auto;
 }
+
 .footer button a {
   color: #ffff;
   font-size: 15px;
