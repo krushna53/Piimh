@@ -1,5 +1,5 @@
 import React from "react";
-// import Banner from "../Components/Banner";
+import Banner from "../Components/Banner";
 import BasicComponent from "../Components/BasicComponent";
 import Philosophy from "../Components/Philosophy";
 import PhilosophyProgram from "../Components/PhilosophyProgram";
@@ -10,7 +10,7 @@ const Home = () => {
   console.log("Slug for Home Page:", id);
   return (
     <>
-      {/* <Banner slug={id} /> */}
+      <Banner slug={id} />
       <BasicComponent/>
       <Philosophy/>
       <PhilosophyProgram/>

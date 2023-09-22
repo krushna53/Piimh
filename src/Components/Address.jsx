@@ -23,7 +23,7 @@ const Address = () => {
         </div>
         <div className="social">
           <p>SOCIAL NETWORKS</p>
-          <div className="d-flex">
+         
             <ul>
               <li>
                 <span><i class="fa-brands fa-facebook-f"></i></span>
@@ -41,8 +41,7 @@ const Address = () => {
                 <span><i class="fa-brands fa-google-plus-g"></i></span>
                 <span>Coming Soon</span>
               </li>
-            </ul>
-          </div>
+            </ul> 
         </div>
       </div>
     </>

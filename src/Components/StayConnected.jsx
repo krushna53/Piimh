@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import client from "../client";
-import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
+// import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import Address from "./Address";
 
+
 const StayConnected = () => {
+
   const { slug } = useParams();
   const [entry, setEntry] = useState([]);
 
