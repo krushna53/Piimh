@@ -81,6 +81,7 @@ const Contact = () => {
                       src={googleMapsUrl}
                       width="100%"
                       height="400"
+                      frameBorder={0}
                       allowFullScreen
                       title="Google Map"
                     ></iframe>

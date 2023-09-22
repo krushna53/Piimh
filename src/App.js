@@ -13,6 +13,7 @@ function App() {
   return (
     <>
       <Header />
+      <div className="wrapper"> 
       <Routes>
         <Route exact path='page/:slug' element={<BasicPage />} />
         <Route exact path='/' element={<Home />} />
@@ -22,6 +23,7 @@ function App() {
         <Route exact path='/contact' element={<Contact />} />
       </Routes>
       <Footer />
+      </div>
     </>
   );
 }
