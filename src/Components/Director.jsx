@@ -38,8 +38,8 @@ const Director = () => {
               <div className="basicComponent">
                 <div className="container">
                   <div className="title_subtitle">
-                    <h3>{subTitle}</h3>
                     <h2>{title}</h2>
+                    <h3>{subTitle}</h3>
                   </div>
                   <div className="basicComponent_wrapper">
                     <div className="basicComponent_content">
