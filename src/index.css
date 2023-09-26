@@ -71,6 +71,7 @@ nav li a.active {
 nav ul li a:hover {
   color: #00a878;
   transition-duration: 0.5s;
+  border-bottom: 1px solid #f37042;
 }
 
 .banner {
@@ -497,7 +498,7 @@ section.philosophy {
 .footer .policies {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  margin: 20px 0px;
+  margin: 20px auto;
 }
 
 .footer button {

@@ -3,7 +3,7 @@ import Banner from "../Components/Banner";
 import BasicComponent from "../Components/BasicComponent";
 import Philosophy from "../Components/Philosophy";
 import PhilosophyProgram from "../Components/PhilosophyProgram";
-// import Director from "../Components/Director";
+import Director from "../Components/Director";
 import StayConnected from "../Components/StayConnected";
 const Home = () => {
   const id = "4hURH4J5WPqHSjm3vABwxo";
@@ -14,7 +14,7 @@ const Home = () => {
       <BasicComponent/>
       <Philosophy/>
       <PhilosophyProgram/>
-      {/* <Director/> */}
+      <Director/>
       <StayConnected/>
     </>
   );
