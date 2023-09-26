@@ -1,163 +1,190 @@
 .banner .d-flex {
-    justify-content: end;
+  justify-content: end;
 }
 
 .philosophy .d-flex {
-    justify-content: center;
-    gap: 5%;
-    align-items: flex-start;
+  justify-content: center;
+  gap: 5%;
+  align-items: flex-start;
 }
 
-
 .title_sub_title {
-    text-align: end;
-    width: 80%;
-    display: block;
-    margin-top: 50px;
+  text-align: end;
+  width: 80%;
+  display: block;
+  margin-top: 50px;
 }
 
 .philosophy p {
-    text-align: left;
-    padding: 5% 0;
-    font-family: "Merriweather", Sans-serif;
-    font-size: 1.2rem;
-    font-weight: 300;
-    line-height: 1.6em;
+  text-align: left;
+  padding: 5% 0;
+  font-family: "Merriweather", Sans-serif;
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 1.6em;
 }
-
 
 /* Adjust the background position and size */
 .philosophy-program .basicComponent {
-    background-position: center bottom;
-    background-size: cover;
-    transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
-    padding: 100px 0;
-    /* Simplify padding values */
-    min-height: 800px;
-    position: relative;
+  background-position: center bottom;
+  background-size: cover;
+  transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+  padding: 100px 0;
+  /* Simplify padding values */
+  min-height: 800px;
+  position: relative;
 }
 
 /* Center and space the content */
 .philosophy-program .basicComponent_wrapper {
-    display: flex;
-    justify-content: space-between;
-    margin: 0 auto;
-    /* Center the content horizontally */
-    padding: 3em;
-    position: relative;
-    gap: 5%;
-    height: 450px;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  /* Center the content horizontally */
+  padding: 3em;
+  position: relative;
+  gap: 5%;
+  height: 450px;
 }
 
 /* Style the heading */
 .philosophy-program .basicComponent_wrapper h2 {
-    color: #F37042;
-    font-family: "Lato", sans-serif;
-    /* Use lowercase for font family name */
-    font-size: 3.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    line-height: 1em;
-    text-align: center;
-    letter-spacing: 3.8px;
-    margin: 0;
-    /* Remove default margin */
+  color: #f37042;
+  font-family: "Lato", sans-serif;
+  /* Use lowercase for font family name */
+  font-size: 3.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  line-height: 1em;
+  text-align: center;
+  letter-spacing: 3.8px;
+  margin: 0;
+  /* Remove default margin */
 }
 
 /* Style the paragraph text */
 .philosophy-program .basicComponent_wrapper p {
-    text-align: left;
-    /* Align text to the left */
-    font-family: "Merriweather", sans-serif;
-    /* Use lowercase for font family name */
-    font-size: 1.2rem;
-    font-weight: 300;
-    line-height: 1.6em;
-    padding: 20px 0;
+  text-align: left;
+  /* Align text to the left */
+  font-family: "Merriweather", sans-serif;
+  /* Use lowercase for font family name */
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 1.6em;
+  padding: 20px 0;
 }
 
 /* Style the background overlay */
 .philosophy-program .elementor-background-overlay {
-    background-color: #00A8782B;
-    opacity: 0.47;
-    mix-blend-mode: darken;
-    transition: background 0.3s, border-radius 0.3s, opacity 0.3s;
-    position: absolute;
-    top: 0;
-    left: 0;
-    /* Set the left position */
-    width: 100%;
-    height: 100%;
+  background-color: #00a8782b;
+  opacity: 0.47;
+  mix-blend-mode: darken;
+  transition: background 0.3s, border-radius 0.3s, opacity 0.3s;
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Set the left position */
+  width: 100%;
+  height: 100%;
 }
 
 /* Style the additional background overlay */
 .philosophy-program .background-overlay {
-    background-color: rgba(255, 255, 255, 0.38);
-    opacity: 0.55;
+  background-color: rgba(255, 255, 255, 0.38);
+  opacity: 0.55;
 }
 
 /* Adjust content alignment */
 .philosophy-program .basicComponent_content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    /* Align content to the right */
-    gap: 4%;
-    position: relative;
-    z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* Align content to the right */
+  gap: 4%;
+  position: relative;
+  z-index: 1;
 }
-
-
 
 /* Director Section */
 section.director {
-    padding: 70px 0px;
-    background: #fff;
+  padding: 70px 0px;
+  background: #fff;
 }
 
-.director .basicComponent{
-    padding: 10px  10px;
-}
 
-.director .container{
-    padding: 10px  10px;
-    
-}
-
-.director .title_subtitle{
-    margin-left: 100px;
-    padding: 10px  10px;
-    text-align: left;
-}
 
 .director h2 {
-    color: #00A878;
-    font-family: "Lato", sans-serif;
-    font-size: 3rem;
+  color: #00a878;
+  font-family: "Lato", sans-serif;
+  font-size: 60px;
+  font-weight: 600;
+  padding-bottom: 30px;
 }
 
 .director h3 {
-    margin: 20px 10px;
-    color: #F37042;
-    font-family: "Merriweather", sans-serif;
-    font-size: 2rem;
-
+  color: #f37042;
+  font-family: "Merriweather", sans-serif;
+  font-size: 33px;
+  font-weight: 300;
+  padding-bottom: 20px;
 }
-.director .basicComponent_wrapper{
-    padding: 10px  10px;
-}
-
-.director .basicComponent_content p{
-    padding: 10px  10px;
-    font-family: "Merriweather", sans-serif;
+.director .basicComponent_wrapper {
+  display: flex;
+  justify-content: space-between;
+  margin: auto;
 }
 
-.director .cta-button{
-    padding: 10px  10px;
-    margin: 0px 30px;
+.director .basicComponent_content p {
+  padding: 15px 0px;
+  font-family: "Merriweather", sans-serif;
+  text-align: justify;
+  font-size: 16px;
+  font-weight: 300;
+}
+.director .basicComponent_content {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin: auto;
+  width:50%;
+  margin-top: 15px;
+}
+.director ul {
+  list-style: none;
+}
+.director li {
+  padding-left: 30px; 
+  position: relative;
+}
+.director li ::before {
+  font-family: FontAwesome;
+  content: "\f105";
+  color: #00a878;
+  font-size: 35px;
+  position: absolute;
+  left: 0;
+  top: 25%;
+  font-weight: 600;
+  
+}
+
+
+.director .right_img {
+  width: 45%;
 }
 
 .director .right_img img {
-    height: 50%;
-    width: 50%;
+  max-width: 100%;
+  width: 100%;
+  height: 465px;
+  margin: auto;
+  box-shadow: -12px 12px 57px 10px rgba(16, 45, 94, 0.17);
+  border-radius: 3px;
+}
+.vc_sep_line {
+  height: 1px;
+  border-top: 2px solid #ebebeb;
+  border-color: #f3704280;
+  display: block;
+  width: 10%;
 }

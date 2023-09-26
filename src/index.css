@@ -176,6 +176,7 @@ nav ul li a:hover {
   font-weight: 200;
   padding: 25px;
   color: rgb(51, 51, 51);
+  
 }
 
 .cta-button {
@@ -190,6 +191,7 @@ nav ul li a:hover {
   cursor: pointer;
   transition: transform 0.3s ease-in;
 }
+ 
 
 .cta-button:hover {
   background-color: #00a878;
@@ -522,6 +524,10 @@ section.philosophy {
     display: block;
     /* Show the menu icon on smaller screens */
   }
+  .container{
+    width: 100%;
+    margin: auto;
+  }
 
   nav {
     position: absolute;
@@ -549,6 +555,19 @@ section.philosophy {
     margin-right: 0;
     margin-bottom: 10px;
   }
+  .Home-about .basicComponent .basicComponent_content {
+    flex-direction: column;
+    position: absolute;
+    top: 100px;
+    left: 0;
+    width: 100%;
+    height: auto;
+  }
+  .Home-about .basicComponent{
+    height: 100%;
+    position: relative;
+  }
+
 
   .footer .policies {
     grid-template-columns: none;
