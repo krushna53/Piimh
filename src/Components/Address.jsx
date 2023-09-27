@@ -8,15 +8,15 @@ const Address = () => {
           <p>REACH US THROUGH</p>
           <ul>
             <li>
-              <span><i class="fa-solid fa-location-dot"></i></span>
+              <span><i className="fa-solid fa-location-dot"></i></span>
               <span>834, 31sr A cross Thilaknagar Jayanagar Bangalore 41</span>
             </li>
             <li>
-              <span><i class="fa-solid fa-phone"></i></span>
+              <span><i className="fa-solid fa-phone"></i></span>
               <span>+91 99720 97848</span>
             </li>
             <li>
-              <span><i class="fa-regular fa-envelope"></i></span>
+              <span><i className="fa-regular fa-envelope"></i></span>
               <span>deepak@piimh.com</span>
             </li>
           </ul>
@@ -26,19 +26,19 @@ const Address = () => {
          
             <ul>
               <li>
-                <span><i class="fa-brands fa-facebook-f"></i></span>
+                <span><i className="fa-brands fa-facebook-f"></i></span>
                 <span>Coming Soon</span>
               </li>
               <li>
-                <span><i class="fa-brands fa-twitter"></i></span>
+                <span><i className="fa-brands fa-twitter"></i></span>
                 <span>Coming Soon</span>
               </li>
               <li>
-                <span><i class="fa-brands fa-instagram"></i></span>
+                <span><i className="fa-brands fa-instagram"></i></span>
                 <span>Coming Soon</span>
               </li>
               <li>
-                <span><i class="fa-brands fa-google-plus-g"></i></span>
+                <span><i className="fa-brands fa-google-plus-g"></i></span>
                 <span>Coming Soon</span>
               </li>
             </ul> 
