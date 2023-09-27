@@ -43,7 +43,7 @@ const StayConnected = () => {
           return (
             <React.Fragment key={id}>
               <div className="basicComponent" style={sectionStyle}>
-                <div class="background-overlay"></div>
+                <div className="background-overlay"></div>
                 <div className="container">
                   <div className="basicComponent_wrapper">
                     <div className="title-sub-title">

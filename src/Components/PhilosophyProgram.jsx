@@ -41,10 +41,10 @@ const PhilosophyProgram = () => {
           return (
             <React.Fragment key={id}>
               <div className="basicComponent" style={sectionStyle}>
-                <div class="elementor-background-overlay"></div>
+                <div className="elementor-background-overlay"></div>
                 <div className="container">
                   <div className="basicComponent_wrapper">
-                    <div class="background-overlay"></div>
+                    <div className="background-overlay"></div>
                     <h2>{title}</h2>
                     <div className="basicComponent_content">
                       {richTextContent}

@@ -39,7 +39,7 @@ const Director = () => {
                 <div className="container">
                   <div className="title_subtitle">
                     <h2>{title}</h2>
-                    <span class="vc_sep_line"></span>
+                    <span className="vc_sep_line"></span>
                     
                     <h3>{subTitle}</h3>
                   </div>
