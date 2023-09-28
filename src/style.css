@@ -270,6 +270,12 @@ span{
 
   .philosophy-program .basicComponent_wrapper {
     flex-direction: column;
+    height:100%;
+    padding: 20px;
+  }
+  
+  .philosophy-program .basicComponent_wrapper h2{
+
     height: 100%;
 
   }
@@ -280,8 +286,10 @@ span{
   }
 
   .philosophy-program .basicComponent_wrapper h2 {
+
     font-size: 20px;
     padding-bottom: 100px;
+    
   }
 
   .philosophy-program .basicComponent {
@@ -291,6 +299,7 @@ span{
 
   .philosophy-program .basicComponent_content {
     align-items: center;
+    padding-top: 100px;
   }
 
   .director .basicComponent_wrapper {
@@ -314,7 +323,15 @@ span{
 
   .director h2 {
     text-align: center;
+    font-size: 45px;
   }
+
+  .director h3{
+    padding-left: 20px;
+  }
+  .vc_sep_line{
+    margin-left: 20px;
+
 
   .director h3 {
     padding-left: 30px;
