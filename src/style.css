@@ -128,6 +128,7 @@ section.director {
   font-weight: 300;
   padding-bottom: 20px;
 }
+
 .director .basicComponent_wrapper {
   display: flex;
   justify-content: space-between;
@@ -141,21 +142,25 @@ section.director {
   font-size: 16px;
   font-weight: 300;
 }
+
 .director .basicComponent_content {
   display: flex;
   align-items: center;
   flex-direction: column;
   margin: auto;
-  width:50%;
+  width: 50%;
   margin-top: 15px;
 }
+
 .director ul {
   list-style: none;
 }
+
 .director li {
-  padding-left: 30px; 
+  padding-left: 30px;
   position: relative;
 }
+
 .director li ::before {
   font-family: FontAwesome;
   content: "\f105";
@@ -165,7 +170,7 @@ section.director {
   left: 0;
   top: 25%;
   font-weight: 600;
-  
+
 }
 
 
@@ -181,6 +186,7 @@ section.director {
   box-shadow: -12px 12px 57px 10px rgba(16, 45, 94, 0.17);
   border-radius: 3px;
 }
+
 .vc_sep_line {
   height: 1px;
   border-top: 2px solid #ebebeb;
@@ -188,51 +194,129 @@ section.director {
   display: block;
   width: 10%;
 }
-@media (max-width: 768px){
-  .title_sub_title{
+
+/* for about us page  */
+section.TitleDescriptionSection {
+
+  padding-top: 100px;
+  margin-top: 50px;
+}
+
+section.TitleDescriptionSection .basicComponent {
+  background-color: #00A8782B;
+  padding: 50px 0;
+}
+
+section.TitleDescriptionSection h2 {
+  text-align: center;
+  color: #F37042;
+  font-family: "Lato", Sans-serif;
+  font-size: 32px;
+  font-weight: 500;
+  text-transform: uppercase;
+  line-height: 1em;
+  letter-spacing: 3.8px;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.TitleDescriptionSection .custom-rich-text-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  /* Three equal-width columns */
+  gap: 20px;
+  /* Adjust the gap between columns as needed */
+  align-items: center;
+  justify-content: center;
+  margin: 50px auto;
+  width: 100%;
+  overflow: hidden;
+  /* Optional: Hide overflowing content */
+}
+.TitleDescriptionSection 
+span{
+  width: 24%;
+  margin: 0 auto;
+  display: block;
+  height: 1px;
+  border-top: 1px solid #F37042;
+}
+
+.TitleDescriptionSection .custom-rich-text-container p {
+  text-align: justify;
+  font-family: "Merriweather", Sans-serif;
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 1.6em;
+}
+
+.TitleDescriptionSection .custom-rich-text-block {
+  background: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+.TitleDescriptionSection .custom-rich-text-container p:empty {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .title_sub_title {
     width: 100%;
     text-align: center;
   }
-  .philosophy-program .basicComponent_wrapper{
+
+  .philosophy-program .basicComponent_wrapper {
     flex-direction: column;
-    height:100%;
+    height: 100%;
 
   }
-  .philosophy-program .elementor-background-overlay{
+
+  .philosophy-program .elementor-background-overlay {
     width: 100%;
     height: 100%;
   }
-  .philosophy-program .basicComponent_wrapper h2{
+
+  .philosophy-program .basicComponent_wrapper h2 {
     font-size: 20px;
     padding-bottom: 100px;
   }
-  .philosophy-program .basicComponent{
-    padding:0px;
+
+  .philosophy-program .basicComponent {
+    padding: 0px;
     height: 100%;
   }
+
   .philosophy-program .basicComponent_content {
     align-items: center;
   }
-  .director .basicComponent_wrapper{
+
+  .director .basicComponent_wrapper {
     flex-direction: column;
 
   }
-  .director .basicComponent_content{
+
+  .director .basicComponent_content {
     flex-direction: column;
   }
-  .director .right_img{
+
+  .director .right_img {
     width: 70%;
     margin: auto;
     padding-top: 40px;
   }
-  
-  .director .right_img img{
+
+  .director .right_img img {
     height: auto;
   }
-  .director h2{
+
+  .director h2 {
     text-align: center;
   }
-  .director h3{
+
+  .director h3 {
     padding-left: 30px;
   }
 }
