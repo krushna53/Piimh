@@ -15,17 +15,17 @@ const Footer = () => {
           </div>
           <div className="policies">
             <button>
-              <Link to="page/terms-of-service">
+              <Link to="/terms-of-service">
                 <span>Terms Of Service</span>
               </Link>
             </button>
             <button>
-              <Link to="page/privacy-statement">
+              <Link to="/privacy-statement">
                 <span>Privacy Statement</span>
               </Link>
             </button>
             <button>
-              <Link to="page/refunds">
+              <Link to="/refunds">
                 <span>Refunds</span>
               </Link>
             </button>

@@ -4,7 +4,7 @@ import BasicComponent from "../Components/BasicComponent";
 import Philosophy from "../Components/Philosophy";
 import PhilosophyProgram from "../Components/PhilosophyProgram";
 import Director from "../Components/Director";
-import StayConnected from "../Components/StayConnected";
+// import StayConnected from "../Components/StayConnected";
 const Home = () => {
   const id = "4hURH4J5WPqHSjm3vABwxo";
   console.log("Slug for Home Page:", id);
@@ -15,7 +15,7 @@ const Home = () => {
       <Philosophy/>
       <PhilosophyProgram/>
       <Director/>
-      <StayConnected/>
+      {/* <StayConnected/> */}
     </>
   );
 };
