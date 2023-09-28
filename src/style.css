@@ -196,15 +196,13 @@ section.director {
   .philosophy-program .basicComponent_wrapper{
     flex-direction: column;
     height:100%;
-
+    padding: 20px;
   }
-  .philosophy-program .elementor-background-overlay{
-    width: 100%;
-    height: 100%;
-  }
+  
   .philosophy-program .basicComponent_wrapper h2{
     font-size: 20px;
     padding-bottom: 100px;
+    
   }
   .philosophy-program .basicComponent{
     padding:0px;
@@ -212,6 +210,7 @@ section.director {
   }
   .philosophy-program .basicComponent_content {
     align-items: center;
+    padding-top: 100px;
   }
   .director .basicComponent_wrapper{
     flex-direction: column;
@@ -231,8 +230,12 @@ section.director {
   }
   .director h2{
     text-align: center;
+    font-size: 45px;
   }
   .director h3{
-    padding-left: 30px;
+    padding-left: 20px;
+  }
+  .vc_sep_line{
+    margin-left: 20px;
   }
 }
