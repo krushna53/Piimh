@@ -18,6 +18,7 @@ const BasicPage = () => {
         });
         if (response.items.length) {
           setEntry(response.items);
+          console.log(response)
 
           // Set the banner image URL here
           const bannerSection = response.items[0].fields.pageComponent.find(
@@ -96,7 +97,7 @@ const BasicPage = () => {
   return (
     <>
       {entry.map((item) => {
-        const { title, subTitle, pageComponent } = item.fields;
+        const { title, subTitle, pageComponent, componentType } = item.fields;
         const id = item.sys.id;
 
         return (
@@ -107,10 +108,11 @@ const BasicPage = () => {
                 description,
                 subTitle,
                 bgColor,
+                componentType:type
               } = component.fields;
 
               // Render the "Director and Lead Trainer" section
-              if (componentTitle === "Director and Lead Trainer") {
+              if (type === "AboutUs-Director") {
                 return (
                   <React.Fragment key={component.sys.id}>
                     <section className="director">
@@ -146,7 +148,7 @@ const BasicPage = () => {
                     </section>
                   </React.Fragment>
                 );
-              } else if (componentTitle === "HOW WE LIVE OUR PHILOSOPHY") {
+              } else if (type === "AboutUs-Philosophy") {
                 // Render the "HOW WE LIVE OUR PHILOSOPHY" section
                 return (
                   <React.Fragment key={component.sys.id}>
