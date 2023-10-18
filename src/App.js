@@ -7,6 +7,7 @@ import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 import StayConnected from './Components/StayConnected'
 import './style.css'
+import Program from "./Pages/Program";
 function App() {
   return (
     <>
@@ -14,6 +15,7 @@ function App() {
       <div className="wrapper"> 
       <Routes>
         <Route exact path='/:slug' element={<BasicPage />} />
+        <Route exact path='/programs' element={<Program />} />
         <Route exact path='/' element={<Home />} />
         <Route exact path='/contact' element={<Contact />} />
       </Routes>
