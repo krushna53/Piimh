@@ -112,8 +112,7 @@ section.director {
 }
 
 
-.director h2 
-{
+.director h2 {
   color: #00a878;
   font-family: "Lato", sans-serif;
   font-size: 60px;
@@ -234,8 +233,8 @@ section.TitleDescriptionSection h2 {
   overflow: hidden;
   /* Optional: Hide overflowing content */
 }
-.TitleDescriptionSection 
-span{
+
+.TitleDescriptionSection span {
   width: 24%;
   margin: 0 auto;
   display: block;
@@ -262,7 +261,8 @@ span{
 .TitleDescriptionSection .custom-rich-text-container p:empty {
   display: none;
 }
-/* for about-us page /section.director  */
+
+/* for about-us page director  */
 
 section.director h2 {
   color: #00a878;
@@ -279,12 +279,9 @@ section.director h3 {
   font-weight: 300;
   padding-bottom: 20px;
 }
+
 section.director ul {
   list-style: none;
-}
-
-section.director .custom-rich-text-block ul:nth-child(2){
-  width:84%;
 }
 
 section.director li {
@@ -301,31 +298,40 @@ section.director li ::before {
   left: 0;
   top: 14%;
   font-weight: 600;
-
 }
-section.director .custom-rich-text-container li p{
+
+section.director .custom-rich-text-container li p {
   padding: 15px 5px;
   font-family: "Merriweather", sans-serif;
   text-align: justify;
   font-size: 16px;
   font-weight: 300;
+  width: 100%;
+}
 
+section.director .custom-rich-text-container ul:nth-of-type(2) {
+  width: 84%;
 }
-section.director .custom-rich-text-container{
-  display:flex;
+
+section.director .custom-rich-text-container {
+  display: flex;
   flex-wrap: wrap;
-  margin:  auto;
+  margin: auto;
 }
-section.director .custom-rich-text-container p
-{
+
+section.director .custom-rich-text-container p {
   width: 40%;
-    font-family: "Merriweather", Sans-serif;
-    font-size: 19px;
-    font-weight: 300;
-    line-height: 1.6em;
-    margin: auto;
-    text-align: justify;
-    color: #333;
+  font-family: "Merriweather", Sans-serif;
+  font-size: 19px;
+  font-weight: 300;
+  line-height: 1.6em;
+  margin: auto;
+  text-align: justify;
+  color: #333;
+}
+
+section.director .custom-rich-text-container p:empty {
+  display: none;
 }
 
 .vc_sep_line {
@@ -347,11 +353,11 @@ section.director .custom-rich-text-container p
 
   .philosophy-program .basicComponent_wrapper {
     flex-direction: column;
-    height:100%;
+    height: 100%;
     padding: 20px;
   }
-  
-  .philosophy-program .basicComponent_wrapper h2{
+
+  .philosophy-program .basicComponent_wrapper h2 {
 
     height: 100%;
 
@@ -366,7 +372,7 @@ section.director .custom-rich-text-container p
 
     font-size: 20px;
     padding-bottom: 100px;
-    
+
   }
 
   .philosophy-program .basicComponent {
@@ -403,10 +409,11 @@ section.director .custom-rich-text-container p
     font-size: 45px;
   }
 
-  .director h3{
+  .director h3 {
     padding-left: 20px;
   }
-  .vc_sep_line{
+
+  .vc_sep_line {
     margin-left: 20px;
   }
 
