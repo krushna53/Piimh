@@ -296,12 +296,12 @@ section.director li ::before {
   font-size: 35px;
   position: absolute;
   left: 0;
-  top: 14%;
+  top: 20%;
   font-weight: 600;
 }
 
 section.director .custom-rich-text-container li p {
-  padding: 15px 5px;
+  padding: 7px 5px;
   font-family: "Merriweather", sans-serif;
   text-align: justify;
   font-size: 16px;
@@ -311,6 +311,18 @@ section.director .custom-rich-text-container li p {
 
 section.director .custom-rich-text-container ul:nth-of-type(2) {
   width: 84%;
+  list-style: disc;
+  font-size: 30px;
+  padding-left: 30px;
+}
+section.director .custom-rich-text-container ul:nth-of-type(2) li{
+  padding-left:0px;
+}
+section.director .custom-rich-text-container ul:nth-of-type(2) p::before{
+content: none;
+}
+section.director .custom-rich-text-container ul:nth-of-type(2) p{
+  font-size: 19px;
 }
 
 section.director .custom-rich-text-container {
@@ -419,5 +431,16 @@ section.director .custom-rich-text-container p:empty {
 
   .director h3 {
     padding-left: 30px;
+  }
+  section.director .custom-rich-text-container ul:nth-of-type(2),
+  section.director .custom-rich-text-container p{
+    width:100%
+  }
+  section.director ul{
+    padding-bottom: 20px;
+  }
+  section.director h3{
+    padding-left: 0px;
+    padding-top: 15px;
   }
 }
