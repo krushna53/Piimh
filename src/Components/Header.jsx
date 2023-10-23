@@ -12,7 +12,7 @@ const Header = () => {
       const entries = await client.getEntries({
         content_type: "menu",
       });
-      setMenuItems(entries.items.reverse());
+      setMenuItems(entries.items);
     }
     getMenuItems();
   }, []);

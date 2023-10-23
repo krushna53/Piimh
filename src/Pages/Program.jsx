@@ -13,12 +13,13 @@ const Program = () => {
     const fetchPage = async () => {
       try {
         const response = await client.getEntries({
-          content_type: "programs",
-          "fields.slug": slug,
+          content_type: "basicPage",
+          "sys.id": "6uUfGCHDHxY6JVNq2Wkbep",
         });
         if (response.items.length) {
           setEntry(response.items);
 
+          // Set the banner image URL here
           const bannerSection = response.items[0].fields.pageComponent.find(
             (component) => component.sys.contentType.sys.id === "bannerSection"
           );
@@ -35,15 +36,7 @@ const Program = () => {
     fetchPage();
   }, [slug]);
 
-  const hasBannerSection = (pageComponent) => {
-    return (
-      Array.isArray(pageComponent) &&
-      pageComponent.some(
-        (component) => component.sys.contentType.sys.id === "bannerSection"
-      )
-    );
-  };
-
+  // Rest of your code...
   const renderCustomRichTextHeading = (node, children) => (
     <div className="custom-rich-text-heading">
       {children.map((child, index) => (
@@ -93,113 +86,101 @@ const Program = () => {
   return (
     <>
       {entry.map((item) => {
-        const { title, subTitle, pageComponent } = item.fields;
+        const { title, subTitle, pageComponent, pageType, componentType } =
+          item.fields;
         const id = item.sys.id;
 
         return (
           <React.Fragment key={id}>
-            {pageComponent &&
-              pageComponent.map((component) => {
-                const {
-                  title: componentTitle,
-                  description,
-                  subTitle,
-                  bgColor,
-                  componentType,
-                } = component.fields;
+            {pageComponent.map((component) => {
+              const {
+                title: componentTitle,
+                description,
+                subTitle,
+                bgColor,
+                componentType: type,
+                pageType,
+              } = component.fields;
 
-                if (componentType === "AboutUs-Director") {
-                  return (
-                    <React.Fragment key={component.sys.id}>
-                      <section className="director">
-                        <div className="basicComponent">
-                          <div className="container">
-                            <div className="title_subtitle">
-                              <h2>{componentTitle}</h2>
-                              <span className="vc_sep_line"></span>
-                              <h3>{subTitle}</h3>
-                            </div>
-                            {renderRichText(description)}
-                          </div>
-                        </div>
-                      </section>
-                    </React.Fragment>
-                  );
-                } else if (
-                  component.sys.contentType.sys.id === "bannerSection"
-                ) {
-                  return (
-                    <React.Fragment key={component.sys.id}>
-                      <section
-                        className="banner"
-                        style={{
-                          backgroundImage: `url(${backgroundImage})`,
-                        }}
-                      >
-                        <div className="background-overlay"></div>
+  
+              if (pageType === "Program" && type === "program-program") {
+                return (
+                  <React.Fragment key={component.sys.id}>
+                    <section className="director">
+                      <div className="basicComponent">
                         <div className="container">
-                          <div className="d-flex">
-                            {renderRichText(description)}
-                          </div>
-                        </div>
-                      </section>
-                    </React.Fragment>
-                  );
-                } else if (componentType === "AboutUs-Philosophy") {
-                  return (
-                    <React.Fragment key={component.sys.id}>
-                      <section className="TitleDescriptionSection">
-                        <div className="basicComponent">
-                          <div className="container">
+                          <div className="title_subtitle">
                             <h2>{componentTitle}</h2>
-                            <span className="divider-separator"></span>
-                            <div className="basicComponent_content">
-                              {renderRichText(description)}
-                            </div>
+                            <span className="vc_sep_line"></span>
+                            <h3>{subTitle}</h3>
                           </div>
+                          {renderRichText(component.fields.description)}
                         </div>
-                      </section>
-                    </React.Fragment>
-                  );
-                } else {
-                  return (
-                    <React.Fragment key={component.sys.id}>
-                      <section className="Home-about">
-                        <div
-                          className="basicComponent"
-                          style={{ backgroundColor: bgColor }}
-                        >
-                          <div className="container">
-                            <div className="basicComponent_wrapper">
-                              <h2>{componentTitle}</h2>
-                              <h3>{subTitle}</h3>
-                              <div className="basicComponent_content">
-                                {renderRichText(description)}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </section>
-                    </React.Fragment>
-                  );
-                }
-              })}
-
-            {!hasBannerSection(pageComponent) && (
-              <section className="basicpage_main">
-                <div className="container">
-                  <div className="basicPage">
-                    <div className="basicPage_wrapper">
-                      <h2>{title}</h2>
-                      <h3>{subTitle}</h3>
-                      <div className="basicPage_content">
-                        {renderRichText(item.fields.description)}
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-            )}
+                    </section>
+                  </React.Fragment>
+                );
+              } else if (component.sys.contentType.sys.id === "bannerSection") {
+                // Render banner section
+                return (
+                  <React.Fragment key={component.sys.id}>
+                    <section
+                      className="banner"
+                      style={{
+                        backgroundImage: `url(${backgroundImage})`,
+                      }}
+                    >
+                      <div className="background-overlay"></div>
+                      <div className="container">
+                        <div className="d-flex">
+                          {renderRichText(description)}
+                        </div>
+                      </div>
+                    </section>
+                  </React.Fragment>
+                );
+              } else if (
+                pageType === "Program" &&
+                type === "program-psychotherapy"
+              ) {
+                return (
+                  <React.Fragment key={component.sys.id}>
+                    <section className="TitleDescriptionSection">
+                      <div className="basicComponent">
+                        <div className="container">
+                          <h2>{componentTitle}</h2>
+                          <span className="divider-separator"></span>
+                          <div className="basicComponent_content">
+                            {renderRichText(component.fields.description)}
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  </React.Fragment>
+                );
+              } else {
+                return (
+                  <React.Fragment key={component.sys.id}>
+                    <section className="Home-about">
+                      <div
+                        className="basicComponent"
+                        style={{ backgroundColor: bgColor }}
+                      >
+                        <div className="container">
+                          <div className="basicComponent_wrapper">
+                            <h2>{componentTitle}</h2>
+                            <h3>{subTitle}</h3>
+                            <div className="basicComponent_content">
+                              {renderRichText(component.fields.description)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  </React.Fragment>
+                );
+              }
+            })}
           </React.Fragment>
         );
       })}
