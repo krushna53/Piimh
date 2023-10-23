@@ -101,8 +101,6 @@ const Program = () => {
                 componentType: type,
                 pageType,
               } = component.fields;
-
-  
               if (pageType === "Program" && type === "program-program") {
                 return (
                   <React.Fragment key={component.sys.id}>
