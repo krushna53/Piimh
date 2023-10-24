@@ -103,7 +103,7 @@ const Program = () => {
                 pageType,
               } = component.fields;
               // console.log(component.fields)
-              // program section
+              // WHY THIS PROGRAM section
               if (pageType === "Program" && type === "program-program") {
                 return (
                   <React.Fragment key={component.sys.id}>
@@ -124,6 +124,26 @@ const Program = () => {
                     </section>
                   </React.Fragment>
                 );
+              }  // WHY THIS PROGRAM section below section
+              else if (pageType === "Program" && type === "program-details") {
+                return (
+                  <React.Fragment key={component.sys.id}>
+                    <section className="program-details">
+                      <div className="basicComponent">
+                        <div className="container">
+                          {/* <div className="title_subtitle">
+                            <p>{subTitle}</p>
+                            <h2>{componentTitle}</h2>
+                            <span className="vc_sep_line"></span>
+                          </div> */}
+                          <div className="basicComponent_content">
+                            {renderRichText(component.fields.description)}
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  </React.Fragment>
+                );
               } else if (component.sys.contentType.sys.id === "bannerSection") {
                 // Render banner section
                 return (
@@ -136,6 +156,7 @@ const Program = () => {
                     >
                       <div className="background-overlay"></div>
                       <div className="container">
+                        {/* <h1>{componentTitle}</h1> */}
                         <div className="d-flex">
                           {renderRichText(description)}
                         </div>
