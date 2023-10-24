@@ -113,7 +113,7 @@ const Program = () => {
                           <div className="title_subtitle">
                             <h2>{componentTitle}</h2>
                             <span className="vc_sep_line"></span>
-                            <h3>{subTitle}</h3>
+                            <p>{subTitle}</p>
                           </div>
                           <div className="d-flex">
                             {renderRichText(component.fields.description)}
@@ -172,8 +172,11 @@ const Program = () => {
                     <section className="Milestones">
                       <div className="basicComponent">
                         <div className="container">
-                          <h2>{componentTitle}</h2>
-                          <span className="divider-separator"></span>
+                          <div className="title_subtitle">
+                            <p>{subTitle}</p>
+                            <h2>{componentTitle}</h2>
+                            <span className="vc_sep_line"></span>
+                          </div>
                           <div className="basicComponent_content">
                             {renderRichText(component.fields.description)}
                           </div>
