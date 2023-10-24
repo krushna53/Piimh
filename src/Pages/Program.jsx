@@ -96,15 +96,18 @@ const Program = () => {
               const {
                 title: componentTitle,
                 description,
+                twoColumDescription,
                 subTitle,
                 bgColor,
                 componentType: type,
                 pageType,
               } = component.fields;
+              // console.log(component.fields)
+              // program section
               if (pageType === "Program" && type === "program-program") {
                 return (
                   <React.Fragment key={component.sys.id}>
-                    <section className="director">
+                    <section className="program">
                       <div className="basicComponent">
                         <div className="container">
                           <div className="title_subtitle">
@@ -112,7 +115,10 @@ const Program = () => {
                             <span className="vc_sep_line"></span>
                             <h3>{subTitle}</h3>
                           </div>
-                          {renderRichText(component.fields.description)}
+                          <div className="d-flex">
+                            {renderRichText(component.fields.description)}
+                            {renderRichText(twoColumDescription)}
+                          </div>
                         </div>
                       </div>
                     </section>
@@ -137,13 +143,15 @@ const Program = () => {
                     </section>
                   </React.Fragment>
                 );
-              } else if (
+              }
+              // what-is-this-program section
+              else if (
                 pageType === "Program" &&
-                type === "program-psychotherapy"
+                type === "program-what-is-this-program"
               ) {
                 return (
                   <React.Fragment key={component.sys.id}>
-                    <section className="TitleDescriptionSection">
+                    <section className="what-is-this-program">
                       <div className="basicComponent">
                         <div className="container">
                           <h2>{componentTitle}</h2>
@@ -156,7 +164,27 @@ const Program = () => {
                     </section>
                   </React.Fragment>
                 );
-              } else {
+              }
+              // Milestones section
+              else if (pageType === "Program" && type === "Milestones") {
+                return (
+                  <React.Fragment key={component.sys.id}>
+                    <section className="Milestones">
+                      <div className="basicComponent">
+                        <div className="container">
+                          <h2>{componentTitle}</h2>
+                          <span className="divider-separator"></span>
+                          <div className="basicComponent_content">
+                            {renderRichText(component.fields.description)}
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  </React.Fragment>
+                );
+              }
+              // WHAT IS PSYCHOTHERAPY section
+              else {
                 return (
                   <React.Fragment key={component.sys.id}>
                     <section className="Home-about">
