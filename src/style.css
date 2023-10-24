@@ -432,7 +432,12 @@ section.Milestones .basicComponent {
   width: 100%;
   overflow: hidden;
 }
-
+.Milestones .title_subtitle{
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  width: 60%;
+}
 .Milestones .title_subtitle p {
   color: #F37042;
   font-family: "Proza Libre", Sans-serif;
@@ -450,6 +455,8 @@ section.Milestones .basicComponent {
   font-weight: 400;
   line-height: 1em;
   letter-spacing: 1px;
+  width:19%;
+  padding: 20px 0px;
 }
 
 .Milestones .custom-rich-text-subheading h2 {
