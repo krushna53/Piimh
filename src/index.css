@@ -351,7 +351,59 @@ section.philosophy {
   -webkit-text-stroke-color: #000;
   stroke: #000;
 }
+/* Program css */
+.what-is-this-program{
+  padding: 70px 0px;
+  margin-top: 70px;
+}
+section.what-is-this-program .basicComponent{
+  width: 60%;
+  margin: auto;
+}
+section.what-is-this-program .basicComponent h2 {
+  color: #f37042;
+  font-family: "Lato", Sans-serif;
+  font-size: 60px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align:center;
+  margin-bottom: 40px;
+}
+section.what-is-this-program ul {
+  list-style: none;
+  padding: 20px 0px;
+}
+section.what-is-this-program li p::before {
+  font-family: FontAwesome;
+  content: "\f00c";
+  color:  #f37042;
+  font-size: 35px;
+  font-weight: 600;
 
+}
+section.what-is-this-program .custom-rich-text-container li p{
+  font-family: "Lato", Sans-serif;
+    font-size: 18px;
+    color: #00a878;
+    padding: 5px 11px;
+}
+section.what-is-this-program .custom-rich-text-container p{
+  text-align: justify;
+    font-family: "Merriweather", Sans-serif;
+    font-size: 19px;
+    font-weight: 300;
+    line-height:1.6em;
+}
+section.what-is-this-program .custom-rich-text-subheading h2{
+  color: #F37042;
+    font-family: "Merriweather", Sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.4rem;
+    
+}
 /* stay connected css */
 .stay-connected .basicComponent {
   background-attachment: fixed;
@@ -588,6 +640,7 @@ section.philosophy {
   }
   .Home-about .basicComponent .basicComponent_wrapper h2 {
     padding: 20px 15px;
+    font-size:26px;
   }
   .philosophy .d-flex {
     flex-direction: column;
@@ -607,7 +660,15 @@ section.philosophy {
   .philosophy .basicComponent_content p {
     padding-left: 50px;
   }
-
+  section.what-is-this-program .basicComponent{
+    width: 100%;
+  }
+  section.what-is-this-program .basicComponent h2{
+    font-size: 40px;
+  }
+  section.what-is-this-program .custom-rich-text-subheading h2{
+    font-size: 17px;
+  }
   .stay-connected .heading-title {
     font-size: 32px;
   }
