@@ -465,6 +465,26 @@ section.Milestones .basicComponent {
   stroke: #000;
 }
 
+.program-details .basicComponent_content h2 {
+  color: #00A878;
+  font-family: "Merriweather", Sans-serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 2.1em;
+  letter-spacing: 3.8px;
+}
+
+.program-details .basicComponent_content h5 {
+  color: #F37042;
+  font-family: "Karla", Sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 26px;
+  letter-spacing: 1.3px;
+}
+
 @media (max-width: 820px),
 (max-width: 1024px) {
   section.director .custom-rich-text-container p {
