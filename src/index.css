@@ -84,10 +84,14 @@ nav ul li a:hover {
 
 .custom-rich-text-block {
   background-color: #e5d8d86b;
+  width:65%;
+  margin: auto;
 }
 
 .banner img {
   width: 300px;
+  display: flex;
+  margin: auto;
 }
 
 .background-overlay {
@@ -103,15 +107,18 @@ nav ul li a:hover {
 
 .banner .custom-rich-text-container {
   position: relative;
+  padding-top: 30px;
 }
 
 .custom-rich-text-heading h1 {
   color: #ffffff;
   font-family: "Lato", Sans-serif;
-  font-size: 66px;
-  font-weight: bold;
+  font-size: 49px;
+  font-weight:300;
   letter-spacing: -1px;
-  margin: 20px 0px 40px 0px;
+  padding: 6px 0px 30px 0px;
+  width: 60%;
+  margin: auto;
 }
 
 .custom-rich-text-subheading h2 {
@@ -121,7 +128,10 @@ nav ul li a:hover {
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 2px;
-  margin-left: 10px;
+  width: 60%;
+  margin: auto;
+  position: relative;
+  left: 10%;
 }
 
 .Home-about .basicComponent {
@@ -137,6 +147,10 @@ nav ul li a:hover {
   font-weight: 600;
   letter-spacing: 3.8px;
   text-align: center;
+}
+.Home-about .basicComponent .basicComponent_wrapper{
+  width: 50%;
+  margin: auto;
 }
 
 .Home-about .basicComponent .basicComponent_wrapper h3 {
@@ -368,7 +382,9 @@ section.what-is-this-program .basicComponent h2 {
   text-transform: uppercase;
   letter-spacing: 1px;
   text-align:center;
-  margin-bottom: 40px;
+  width: 60%;
+    margin: auto;
+    padding-bottom: 20px;
 }
 section.what-is-this-program ul {
   list-style: none;
@@ -389,20 +405,30 @@ section.what-is-this-program .custom-rich-text-container li p{
     padding: 5px 11px;
 }
 section.what-is-this-program .custom-rich-text-container p{
-  text-align: justify;
     font-family: "Merriweather", Sans-serif;
-    font-size: 19px;
+    font-size: 1.2rem;
     font-weight: 300;
     line-height:1.6em;
 }
-section.what-is-this-program .custom-rich-text-subheading h2{
+section.what-is-this-program .custom-rich-text-container .custom-rich-text-subheading h2{
   color: #F37042;
     font-family: "Merriweather", Sans-serif;
     font-size: 17px;
     font-weight: 400;
     font-style: italic;
     line-height: 1.4rem;
+    width: 100%;
+    left:0%;
     
+}
+section.what-is-this-program .divider-separator{
+  height: 1px;
+  border-top: 4px solid #ebebeb;
+  border-color: #00a878;
+  display: block;
+  width: 8%;
+  margin: auto;
+  padding-bottom: 50px;
 }
 /* stay connected css */
 .stay-connected .basicComponent {
@@ -556,6 +582,7 @@ section.what-is-this-program .custom-rich-text-subheading h2{
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 .footer button {
@@ -635,6 +662,20 @@ section.what-is-this-program .custom-rich-text-subheading h2{
     position: unset;
     padding: 10px 0px;
   }
+  .custom-rich-text-heading h1{
+    width: 100%;
+    font-size: 35px;
+  }
+  .custom-rich-text-block{
+    width: 100%;
+  }
+  .custom-rich-text-subheading h2{
+    width: 100%;
+    left: 5%;
+  }
+  .Home-about .basicComponent .basicComponent_wrapper{
+    width:100%;
+  }
   .Home-about .basicComponent .basicComponent_wrapper h3 {
     padding: 50px;
   }
@@ -678,6 +719,9 @@ section.what-is-this-program .custom-rich-text-subheading h2{
   .philosophy .Right_img img {
     width: 100%;
     height: 400px;
+  }
+  section.what-is-this-program .custom-rich-text-container .custom-rich-text-subheading h2{
+    left:0%;
   }
 
   .stay-connected .basicComponent_content div,

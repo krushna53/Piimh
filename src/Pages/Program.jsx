@@ -72,6 +72,7 @@ const Program = () => {
                 return (
                   <div className="custom-rich-text-block">
                     <img src={imageUrl} alt={altText} loading="lazy" />
+                    <span className="vc_sep_line"></span>
                   </div>
                 );
               },
@@ -193,7 +194,7 @@ const Program = () => {
                     <section className="Milestones">
                       <div className="basicComponent">
                         <div className="container">
-                          <div className="title_subtitle">
+                        <div className="title_subtitle">
                             <p>{subTitle}</p>
                             <h2>{componentTitle}</h2>
                             <span className="vc_sep_line"></span>
@@ -201,6 +202,7 @@ const Program = () => {
                           <div className="basicComponent_content">
                             {renderRichText(component.fields.description)}
                           </div>
+                        
                         </div>
                       </div>
                     </section>
