@@ -176,7 +176,7 @@ nav ul li a:hover {
   padding: 50px 50px 50px 50px;
   position: absolute;
   top: 40%;
-  left: 19%;
+  left: 21.5%;
 }
 
 .Home-about .basicComponent_content p {
@@ -305,26 +305,35 @@ form .d-flex {
 .basicPage {
   width: 70%;
   margin: auto;
-  padding: 50px 30px;
+  padding: 50px 40px;
   background-color: #fff;
   box-shadow: 20px 20px 80px 0px rgba(0, 0, 0, 0.1);
 }
 
-.basicPage_wrapper h2 {
+.basicPage_wrapper h1 {
   text-align: center;
-  font-size: 14px;
-  font-weight: 400;
-  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 70px;
 }
 
-.basicPage_wrapper h3 {
-  font-size: 14px;
-  font-weight: 400;
+.basicPage_wrapper h2 {
+  font-size: 16px;
+  font-weight: 700;
 }
-
+.basicPage_content ul {
+  width: 80%;
+  margin: auto;
+}
+.basicPage_content li p {
+  padding: 5px 0px;
+}
 .basicPage_content p {
   text-align: justify;
   padding: 20px 0px;
+  line-height: 23px;
+  font-size: 14px;
+  font-family: Arial;
 }
 
 /* for philosophy css  */
@@ -615,13 +624,14 @@ section.what-is-this-program .divider-separator {
     left: 1%;
   }
 }
-@media screen and (max-width: 768px){
+@media screen and (max-width: 768px) {
   .footer .policies {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     margin-top: 30px;
     margin-bottom: 30px;
-}
+  }
+  
 }
 @media screen and (max-width: 768px), (max-width: 360px) {
   .humber_menu {
@@ -714,7 +724,7 @@ section.what-is-this-program .divider-separator {
     width: 100%;
   }
   section.what-is-this-program .basicComponent h2 {
-    font-size: 40px;
+    font-size: 32px;
   }
   section.what-is-this-program .custom-rich-text-subheading h2 {
     font-size: 17px;
@@ -751,6 +761,9 @@ section.what-is-this-program .divider-separator {
   .philosophy .heading-title {
     padding-bottom: 20px;
   }
+  .basicPage{
+    width: 100%;
+  }
 
   .reach {
     padding-bottom: 20px;
@@ -780,7 +793,7 @@ section.what-is-this-program .divider-separator {
 
   .footer .policies {
     display: block;
-    /* width: 70%; */
+    width: 70%;
   }
   .footer button {
     margin: 10px 13px;
