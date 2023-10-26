@@ -526,13 +526,16 @@ section.Milestones .basicComponent {
 .program-details .custom-rich-text-block {
   background: none;
 }
-.program-details .custom-rich-text-block .vc_sep_line {
+.program-details .basicComponent_content .custom-rich-text-block .vc_sep_line {
   height: 1px;
   border-top: 2px solid #ebebeb;
   border-color: #f37042;
   display: block;
   width: 6%;
   margin: auto;
+}
+.banner .custom-rich-text-block .vc_sep_line{
+  display: none;
 }
 @media (max-width: 820px), (max-width: 1024px) {
   section.director .custom-rich-text-container p {
@@ -640,7 +643,7 @@ section.Milestones .basicComponent {
     width: 100%;
   }
   .Milestones .vc_sep_line {
-    left: 55%;
+    left: 27%;
     width: 10%;
   }
   .Milestones .custom-rich-text-container {

@@ -84,7 +84,7 @@ nav ul li a:hover {
 
 .custom-rich-text-block {
   background-color: #e5d8d86b;
-  width:65%;
+  width: 65%;
   margin: auto;
 }
 
@@ -114,7 +114,7 @@ nav ul li a:hover {
   color: #ffffff;
   font-family: "Lato", Sans-serif;
   font-size: 49px;
-  font-weight:300;
+  font-weight: 300;
   letter-spacing: -1px;
   padding: 6px 0px 30px 0px;
   width: 60%;
@@ -148,7 +148,7 @@ nav ul li a:hover {
   letter-spacing: 3.8px;
   text-align: center;
 }
-.Home-about .basicComponent .basicComponent_wrapper{
+.Home-about .basicComponent .basicComponent_wrapper {
   width: 50%;
   margin: auto;
 }
@@ -176,7 +176,7 @@ nav ul li a:hover {
   padding: 50px 50px 50px 50px;
   position: absolute;
   top: 40%;
-  left: 20%;
+  left: 19%;
 }
 
 .Home-about .basicComponent_content p {
@@ -366,11 +366,11 @@ section.philosophy {
   stroke: #000;
 }
 /* Program css */
-.what-is-this-program{
+.what-is-this-program {
   padding: 70px 0px;
   margin-top: 70px;
 }
-section.what-is-this-program .basicComponent{
+section.what-is-this-program .basicComponent {
   width: 60%;
   margin: auto;
 }
@@ -381,10 +381,10 @@ section.what-is-this-program .basicComponent h2 {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-align:center;
+  text-align: center;
   width: 60%;
-    margin: auto;
-    padding-bottom: 20px;
+  margin: auto;
+  padding-bottom: 20px;
 }
 section.what-is-this-program ul {
   list-style: none;
@@ -393,35 +393,36 @@ section.what-is-this-program ul {
 section.what-is-this-program li p::before {
   font-family: FontAwesome;
   content: "\f00c";
-  color:  #f37042;
+  color: #f37042;
   font-size: 35px;
   font-weight: 600;
-
 }
-section.what-is-this-program .custom-rich-text-container li p{
+section.what-is-this-program .custom-rich-text-container li p {
   font-family: "Lato", Sans-serif;
-    font-size: 18px;
-    color: #00a878;
-    padding: 5px 11px;
+  font-size: 18px;
+  color: #00a878;
+  padding: 5px 11px;
 }
-section.what-is-this-program .custom-rich-text-container p{
-    font-family: "Merriweather", Sans-serif;
-    font-size: 1.2rem;
-    font-weight: 300;
-    line-height:1.6em;
+section.what-is-this-program .custom-rich-text-container p {
+  font-family: "Merriweather", Sans-serif;
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 1.6em;
 }
-section.what-is-this-program .custom-rich-text-container .custom-rich-text-subheading h2{
-  color: #F37042;
-    font-family: "Merriweather", Sans-serif;
-    font-size: 17px;
-    font-weight: 400;
-    font-style: italic;
-    line-height: 1.4rem;
-    width: 100%;
-    left:0%;
-    
+section.what-is-this-program
+  .custom-rich-text-container
+  .custom-rich-text-subheading
+  h2 {
+  color: #f37042;
+  font-family: "Merriweather", Sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.4rem;
+  width: 100%;
+  left: 0%;
 }
-section.what-is-this-program .divider-separator{
+section.what-is-this-program .divider-separator {
   height: 1px;
   border-top: 4px solid #ebebeb;
   border-color: #00a878;
@@ -614,6 +615,14 @@ section.what-is-this-program .divider-separator{
     left: 1%;
   }
 }
+@media screen and (max-width: 768px){
+  .footer .policies {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+}
 @media screen and (max-width: 768px), (max-width: 360px) {
   .humber_menu {
     display: block;
@@ -662,26 +671,26 @@ section.what-is-this-program .divider-separator{
     position: unset;
     padding: 10px 0px;
   }
-  .custom-rich-text-heading h1{
+  .custom-rich-text-heading h1 {
     width: 100%;
     font-size: 35px;
   }
-  .custom-rich-text-block{
+  .custom-rich-text-block {
     width: 100%;
   }
-  .custom-rich-text-subheading h2{
+  .custom-rich-text-subheading h2 {
     width: 100%;
     left: 5%;
   }
-  .Home-about .basicComponent .basicComponent_wrapper{
-    width:100%;
+  .Home-about .basicComponent .basicComponent_wrapper {
+    width: 100%;
   }
   .Home-about .basicComponent .basicComponent_wrapper h3 {
     padding: 50px;
   }
   .Home-about .basicComponent .basicComponent_wrapper h2 {
     padding: 20px 15px;
-    font-size:26px;
+    font-size: 26px;
   }
   .philosophy .d-flex {
     flex-direction: column;
@@ -701,13 +710,13 @@ section.what-is-this-program .divider-separator{
   .philosophy .basicComponent_content p {
     padding-left: 50px;
   }
-  section.what-is-this-program .basicComponent{
+  section.what-is-this-program .basicComponent {
     width: 100%;
   }
-  section.what-is-this-program .basicComponent h2{
+  section.what-is-this-program .basicComponent h2 {
     font-size: 40px;
   }
-  section.what-is-this-program .custom-rich-text-subheading h2{
+  section.what-is-this-program .custom-rich-text-subheading h2 {
     font-size: 17px;
   }
   .stay-connected .heading-title {
@@ -720,8 +729,11 @@ section.what-is-this-program .divider-separator{
     width: 100%;
     height: 400px;
   }
-  section.what-is-this-program .custom-rich-text-container .custom-rich-text-subheading h2{
-    left:0%;
+  section.what-is-this-program
+    .custom-rich-text-container
+    .custom-rich-text-subheading
+    h2 {
+    left: 0%;
   }
 
   .stay-connected .basicComponent_content div,
@@ -739,8 +751,19 @@ section.what-is-this-program .divider-separator{
   .philosophy .heading-title {
     padding-bottom: 20px;
   }
+
   .reach {
     padding-bottom: 20px;
+  }
+  .form-container .d-flex {
+    flex-direction: column;
+  }
+  .form-container .form {
+    width: 100%;
+    margin-bottom: 40px;
+  }
+  .form-container .map {
+    width: 100%;
   }
 
   .stay-connected .basicComponent_content {
@@ -757,9 +780,9 @@ section.what-is-this-program .divider-separator{
 
   .footer .policies {
     display: block;
-    width: 70%;
+    /* width: 70%; */
   }
   .footer button {
-    margin: 10px 0px;
+    margin: 10px 13px;
   }
 }
