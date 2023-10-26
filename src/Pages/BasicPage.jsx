@@ -8,7 +8,9 @@ const BasicPage = () => {
   const { slug } = useParams();
   const [backgroundImage, setBackgroundImage] = useState("");
   const [entry, setEntry] = useState([]);
-
+  useEffect(()=>{
+    window.scrollTo(0,0);
+  },[slug])
   useEffect(() => {
     const fetchPage = async () => {
       try {
@@ -21,13 +23,15 @@ const BasicPage = () => {
           console.log(response)
 
           // Set the banner image URL here
-          const bannerSection = response.items[0].fields.pageComponent.find(
-            (component) => component.sys.contentType.sys.id === "bannerSection"
-          );
-          if (bannerSection) {
-            const bannerImage =
-              bannerSection.fields.backgroundImage?.fields.file.url || "";
-            setBackgroundImage(bannerImage);
+          if (response.items[0].fields.pageComponent) {
+            const bannerSection = response.items[0].fields.pageComponent.find(
+              (component) => component.sys.contentType.sys.id === "bannerSection"
+            );
+            if (bannerSection) {
+              const bannerImage =
+                bannerSection.fields.backgroundImage?.fields.file.url || "";
+              setBackgroundImage(bannerImage);
+            }
           }
         }
       } catch (error) {
@@ -99,10 +103,10 @@ const BasicPage = () => {
       {entry.map((item) => {
         const { title, subTitle, pageComponent, componentType } = item.fields;
         const id = item.sys.id;
-
+        console.log(item.fields);
         return (
           <React.Fragment key={id}>
-            {pageComponent.map((component) => {
+            {pageComponent && pageComponent.map((component) => {
               const {
                 title: componentTitle,
                 description,
@@ -196,8 +200,8 @@ const BasicPage = () => {
                 <div className="container">
                   <div className="basicPage">
                     <div className="basicPage_wrapper">
-                      <h2>{title}</h2>
-                      <h3>{subTitle}</h3>
+                      <h1>{title}</h1>
+                      <h2>{subTitle}</h2>
                       <div className="basicPage_content">
                         {renderRichText(item.fields.description)}
                       </div>
