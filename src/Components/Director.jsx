@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import client from "../client";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
-
+import Aos from "aos";
 const Director = () => {
   const { slug } = useParams();
   const [entry, setEntry] = useState([]);
 
   useEffect(() => {
+    Aos.init({ duration: 2000 });
     const fetchPage = async () => {
       try {
         const response = await client.getEntries({
@@ -38,19 +39,19 @@ const Director = () => {
               <div className="basicComponent">
                 <div className="container">
                   <div className="title_subtitle">
-                    <h2>{title}</h2>
+                    <h2 data-aos="fade-left" data-aos-offset="200">{title}</h2>
                     <span className="vc_sep_line"></span>
                     
                     <h3>{subTitle}</h3>
                   </div>
                   <div className="basicComponent_wrapper">
-                    <div className="basicComponent_content">
+                    <div className="basicComponent_content" data-aos="fade-left" data-aos-offset="200">
                       {richTextContent}
                       <a href={link} className="cta-button">
                         {ctaButton}
                       </a>
                     </div>
-                    <div className="right_img">
+                    <div className="right_img" data-aos="fade-right" data-aos-offset="200">
                       <img src={imageUrl} alt={title} width={100} />
                     </div>
                   </div>

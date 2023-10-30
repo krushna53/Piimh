@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import client from "../client";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
+import Aos from "aos";
 
 const Philosophy = () => {
   const { slug } = useParams();
   const [entry, setEntry] = useState([]);
 
   useEffect(() => {
+    Aos.init({ duration: 2000 });
     const fetchPage = async () => {
       try {
         const response = await client.getEntries({
@@ -50,14 +52,14 @@ const Philosophy = () => {
               <div className="container">
                 <div className="basicComponent">
                   <div className="title_sub_title">
-                    <h3>{subTitle}</h3>
-                    <h2 className="heading-title">{title}</h2>
+                    <h3  data-aos="fade-left" data-aos-offset="200">{subTitle}</h3>
+                    <h2 className="heading-title" data-aos="fade-right" data-aos-offset="200">{title}</h2>
                   </div>
                   <div className="basicComponent_wrapper d-flex">
                     <div className="Right_img">
-                      <img src={imageUrl} alt={title} width={100} />
+                      <img  data-aos="fade-left" data-aos-offset="200" src={imageUrl} alt={title} width={100} />
                     </div>
-                    <div className="basicComponent_content">
+                    <div className="basicComponent_content" data-aos="fade-right" data-aos-offset="200">
                       {richTextContent}
                     </div>
                   </div>

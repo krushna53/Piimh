@@ -3,13 +3,14 @@ import { useParams } from "react-router-dom";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS } from "@contentful/rich-text-types";
 import client from "../client";
-
+import Aos from "aos";
 const Program = () => {
   const { slug } = useParams();
   const [backgroundImage, setBackgroundImage] = useState("");
   const [entry, setEntry] = useState([]);
 
   useEffect(() => {
+    Aos.init({ duration: 2000 });
     const fetchPage = async () => {
       try {
         const response = await client.getEntries({
@@ -112,9 +113,9 @@ const Program = () => {
                       <div className="basicComponent">
                         <div className="container">
                           <div className="title_subtitle">
-                            <h2>{componentTitle}</h2>
+                            <h2 data-aos="fade-left" data-aos-offset="200">{componentTitle}</h2>
                             <span className="vc_sep_line"></span>
-                            <p>{subTitle}</p>
+                            <p data-aos="fade-right" data-aos-offset="200">{subTitle}</p>
                           </div>
                           <div className="d-flex">
                             {renderRichText(component.fields.description)}
@@ -137,7 +138,7 @@ const Program = () => {
                             <h2>{componentTitle}</h2>
                             <span className="vc_sep_line"></span>
                           </div> */}
-                          <div className="basicComponent_content">
+                          <div className="basicComponent_content" data-aos="fade-left" data-aos-offset="200" >
                             {renderRichText(component.fields.description)}
                           </div>
                         </div>
@@ -176,9 +177,9 @@ const Program = () => {
                     <section className="what-is-this-program">
                       <div className="basicComponent">
                         <div className="container">
-                          <h2>{componentTitle}</h2>
+                          <h2 data-aos="fade-left" data-aos-offset="200">{componentTitle}</h2>
                           <span className="divider-separator"></span>
-                          <div className="basicComponent_content">
+                          <div className="basicComponent_content" data-aos="fade-right" data-aos-offset="200">
                             {renderRichText(component.fields.description)}
                           </div>
                         </div>
@@ -195,11 +196,11 @@ const Program = () => {
                       <div className="basicComponent">
                         <div className="container">
                         <div className="title_subtitle">
-                            <p>{subTitle}</p>
-                            <h2>{componentTitle}</h2>
+                            <p data-aos="fade-left" data-aos-offset="200">{subTitle}</p>
+                            <h2 data-aos="fade-right" data-aos-offset="200">{componentTitle}</h2>
                             <span className="vc_sep_line"></span>
                           </div>
-                          <div className="basicComponent_content">
+                          <div className="basicComponent_content" data-aos="fade-left" data-aos-offset="200">
                             {renderRichText(component.fields.description)}
                           </div>
                         
@@ -220,9 +221,9 @@ const Program = () => {
                       >
                         <div className="container">
                           <div className="basicComponent_wrapper">
-                            <h2>{componentTitle}</h2>
-                            <h3>{subTitle}</h3>
-                            <div className="basicComponent_content">
+                            <h2 data-aos="fade-left" data-aos-offset="200">{componentTitle}</h2>
+                            <h3 data-aos="fade-right" data-aos-offset="200">{subTitle}</h3>
+                            <div className="basicComponent_content" data-aos="fade-left" data-aos-offset="200">
                               {renderRichText(component.fields.description)}
                             </div>
                           </div>

@@ -7,6 +7,7 @@ import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 import StayConnected from './Components/StayConnected'
 import './style.css'
+import '../src/dist/aos.css'
 import Program from "./Pages/Program";
 function App() {
   return (
