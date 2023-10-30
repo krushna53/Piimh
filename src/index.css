@@ -333,7 +333,7 @@ form .d-flex {
   padding: 20px 0px;
   line-height: 23px;
   font-size: 14px;
-  font-family: Arial;
+  font-family: "Merriweather", Sans-serif;
 }
 
 /* for philosophy css  */
@@ -611,6 +611,17 @@ section.what-is-this-program .divider-separator {
 }
 
 /* Mobile menu styles */
+@media screen and (min-width:1500px) and (max-width: 1600px){ 
+  .Home-about .basicComponent .basicComponent_content {
+    left: 25%;
+  }
+}
+
+@media screen and (max-width: 1450px){ 
+  .Home-about .basicComponent .basicComponent_content {
+    left: 21.5%;
+  }
+}
 @media screen and (max-width: 1024px) {
   .Home-about .basicComponent {
     height: 800px;

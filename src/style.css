@@ -305,7 +305,7 @@ section.director .custom-rich-text-container li p {
 }
 
 section.director .custom-rich-text-container ul:nth-of-type(2) {
-  width: 84%;
+  width: 85%;
   list-style: disc;
   font-size: 30px;
   padding-left: 30px;
@@ -330,7 +330,7 @@ section.director .custom-rich-text-container {
 }
 
 section.director .custom-rich-text-container p {
-  width: 40%;
+  width: 36%;
   font-family: "Merriweather", Sans-serif;
   font-size: 19px;
   font-weight: 300;
