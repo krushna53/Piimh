@@ -79,9 +79,8 @@ const Banner = () => {
 
   return (
     <section
-      className="banner"
-      style={{ backgroundImage: `url(${backgroundImage})` }}
-    >
+      className="banner"     style={{ backgroundImage: `url(${backgroundImage})` }}
+    > <div className="homepage_banner">
       <div className="background-overlay"></div>
       <div className="container">
       <div className="d-flex">
@@ -90,6 +89,7 @@ const Banner = () => {
             {renderRichText(item.fields.description)}
           </React.Fragment>
         ))}
+      </div>
       </div>
       </div>
     </section>
