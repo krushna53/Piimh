@@ -81,8 +81,51 @@ nav ul li a:hover {
   height: 100vh;
   /* transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s; */
 }
+.banner .homepage_banner .custom-rich-text-block {
+  background-color: #e5d8d86b;
+  width: 100%;
+  margin: 0px;
+}
 
-.custom-rich-text-block {
+.banner .homepage_banner img {
+  width: 300px;
+  display: block;
+  margin: 0px;
+}
+
+.banner .homepage_banner .custom-rich-text-container {
+   position: relative;
+  padding-top: 0px;
+}
+
+.homepage_banner .custom-rich-text-heading h1 {
+  color: #ffffff;
+  font-family: "Lato", Sans-serif;
+  font-size: 66px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  padding: 6px 0px 30px 0px;
+  width: 100%;
+  margin: 0px;
+}
+
+.homepage_banner .custom-rich-text-subheading h2 {
+  color: #ffffff;
+  font-family: "Merriweather", Sans-serif;
+  font-size: 22px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  width: 100%;
+  margin: 0px;
+  left: 6%;
+  
+} 
+
+
+/* for program section banner page */
+
+ .custom-rich-text-block {
   background-color: #e5d8d86b;
   width: 65%;
   margin: auto;
@@ -114,7 +157,7 @@ nav ul li a:hover {
   color: #ffffff;
   font-family: "Lato", Sans-serif;
   font-size: 49px;
-  font-weight: 300;
+  font-weight: 700;
   letter-spacing: -1px;
   padding: 6px 0px 30px 0px;
   width: 60%;
@@ -133,6 +176,7 @@ nav ul li a:hover {
   position: relative;
   left: 10%;
 }
+
 
 .Home-about .basicComponent {
   padding: 50px 0px;
