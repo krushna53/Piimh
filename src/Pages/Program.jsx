@@ -113,9 +113,9 @@ const Program = () => {
                       <div className="basicComponent">
                         <div className="container">
                           <div className="title_subtitle">
-                            <h2 data-aos="fade-left" data-aos-offset="200">{componentTitle}</h2>
+                            <h2>{componentTitle}</h2>
                             <span className="vc_sep_line"></span>
-                            <p data-aos="fade-right" data-aos-offset="200">{subTitle}</p>
+                            <p>{subTitle}</p>
                           </div>
                           <div className="d-flex">
                             {renderRichText(component.fields.description)}
@@ -138,7 +138,7 @@ const Program = () => {
                             <h2>{componentTitle}</h2>
                             <span className="vc_sep_line"></span>
                           </div> */}
-                          <div className="basicComponent_content" data-aos="fade-left" data-aos-offset="200" >
+                          <div className="basicComponent_content">
                             {renderRichText(component.fields.description)}
                           </div>
                         </div>
@@ -200,7 +200,7 @@ const Program = () => {
                             <h2 data-aos="fade-right" data-aos-offset="200">{componentTitle}</h2>
                             <span className="vc_sep_line"></span>
                           </div>
-                          <div className="basicComponent_content" data-aos="fade-left" data-aos-offset="200">
+                          <div className="basicComponent_content">
                             {renderRichText(component.fields.description)}
                           </div>
                         
