@@ -39,7 +39,7 @@ const Director = () => {
               <div className="basicComponent">
                 <div className="container">
                   <div className="title_subtitle">
-                    <h2 data-aos="fade-left" data-aos-offset="200">{title}</h2>
+                    <h2>{title}</h2>
                     <span className="vc_sep_line"></span>
                     
                     <h3>{subTitle}</h3>

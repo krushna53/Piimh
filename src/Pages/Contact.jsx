@@ -1,10 +1,64 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import emailjs from "@emailjs/browser";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useParams } from "react-router-dom";
 import client from "../client";
 const Contact = () => {
   const { slug } = useParams();
   const [entry, setEntry] = useState([]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [service, setService] = useState("");
+  const [message, setMessage] = useState("");
 
+  const notify = () => {
+    toast.success(
+      "Thank you for contacting Piimh. We will respond to your message within 3 working days.😊",
+      {
+        position: "top-right",
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      }
+    );
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const templateParams = {
+      user_name: name,
+      user_email: email,
+      service: service,
+      message: message,
+    };
+
+    emailjs
+      .send(
+        process.env.REACT_APP_EMAILJS_SERVICEID,
+        process.env.REACT_APP_EMAILJS_TEMPLATEID,
+        templateParams,
+        process.env.REACT_APP_EMAILJS_PUBLICKEY
+      )
+      .then(
+        (response) => {
+          notify();
+          setName("");
+          setEmail("");
+          setService("");
+          setMessage("");
+
+          console.log("Email sent:", response);
+        },
+        (error) => {
+          console.error("Failed to send the email:", error);
+        }
+      );
+  };
   useEffect(() => {
     const fetchPage = async () => {
       try {
@@ -30,7 +84,7 @@ const Contact = () => {
             <h2>CONTACT US</h2>
           </div>
           <div className="d-flex">
-            <form className="form">
+            <form className="form" onSubmit={handleSubmit}>
               <div className="input-field">
                 <label htmlFor="name">
                   Your Name <span>*</span>
@@ -39,8 +93,8 @@ const Contact = () => {
                   type="text"
                   id="name"
                   name="user_name"
-                  // value={name}
-                  // onChange={(e) => setName(e.target.value)}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
                 />
               </div>
@@ -52,8 +106,8 @@ const Contact = () => {
                   type="email"
                   name="email"
                   id="email"
-                  // value={email}
-                  // onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
@@ -64,13 +118,25 @@ const Contact = () => {
                 <textarea
                   name="message"
                   id="message"
-                  // value={message}
-                  //  onChange= /*{(e) => setMessage(e.target.value)}*/
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                   cols="40"
                   rows="10"
                 ></textarea>
               </div>
               <input type="submit" value="Submit" className="submit_btn" />
+              <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+              />
             </form>
             <div className="map">
               {entry.map((item) => {
@@ -81,7 +147,6 @@ const Contact = () => {
                       src={googleMapsUrl}
                       width="100%"
                       height="400"
-                      frameBorder={0}
                       allowFullScreen
                       title="Google Map"
                     ></iframe>

@@ -126,9 +126,9 @@ const BasicPage = () => {
                         <div className="basicComponent">
                           <div className="container">
                             <div className="title_subtitle">
-                              <h2 data-aos="fade-left" data-aos-offset="200">{componentTitle}</h2>
+                              <h2>{componentTitle}</h2>
                               <span className="vc_sep_line"></span>
-                              <h3 data-aos="fade-right" data-aos-offset="200">{subTitle}</h3>
+                              <h3>{subTitle}</h3>
                             </div>
                             {renderRichText(component.fields.description)}
                           </div>
@@ -164,9 +164,9 @@ const BasicPage = () => {
                       <section className="TitleDescriptionSection">
                         <div className="basicComponent">
                           <div className="container">
-                            <h2 data-aos="fade-left" data-aos-offset="200">{componentTitle}</h2>
+                            <h2>{componentTitle}</h2>
                             <span className="divider-separator"></span>
-                            <div className="basicComponent_content" data-aos="fade-right" data-aos-offset="200">
+                            <div className="basicComponent_content">
                               {renderRichText(component.fields.description)}
                             </div>
                           </div>
@@ -185,9 +185,17 @@ const BasicPage = () => {
                         >
                           <div className="container">
                             <div className="basicComponent_wrapper">
-                              <h2 data-aos="fade-left" data-aos-offset="200">{componentTitle}</h2>
-                              <h3 data-aos="fade-right" data-aos-offset="200">{subTitle}</h3>
-                              <div className="basicComponent_content" data-aos="fade-left" data-aos-offset="200">
+                              <h2 data-aos="fade-left" data-aos-offset="200">
+                                {componentTitle}
+                              </h2>
+                              <h3 data-aos="fade-right" data-aos-offset="200">
+                                {subTitle}
+                              </h3>
+                              <div
+                                className="basicComponent_content"
+                                data-aos="fade-left"
+                                data-aos-offset="200"
+                              >
                                 {renderRichText(component.fields.description)}
                               </div>
                             </div>
