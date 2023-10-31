@@ -33,7 +33,6 @@ const Contact = () => {
     const templateParams = {
       user_name: name,
       user_email: email,
-      service: service,
       message: message,
     };
 
@@ -104,7 +103,7 @@ const Contact = () => {
                 </label>
                 <input
                   type="email"
-                  name="email"
+                  name="user_email"
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -142,7 +141,7 @@ const Contact = () => {
               {entry.map((item) => {
                 const googleMapsUrl = item.fields.googleMapsUrl; // Replace with your actual field name
                 return (
-                  <>
+                  <React.Fragment key={item.sys}>
                     <iframe
                       src={googleMapsUrl}
                       width="100%"
@@ -150,7 +149,7 @@ const Contact = () => {
                       allowFullScreen
                       title="Google Map"
                     ></iframe>
-                  </>
+                  </React.Fragment>
                 );
               })}
             </div>
