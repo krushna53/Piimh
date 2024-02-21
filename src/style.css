@@ -408,8 +408,8 @@ section.program .d-flex p {
 }
 
 section.Milestones {
-  padding-top: 100px;
-  margin-top: 50px;
+  padding-top: 0px;
+  margin-top: 0px;
 }
 
 section.Milestones .basicComponent {
@@ -534,8 +534,95 @@ section.Milestones .basicComponent {
   width: 6%;
   margin: auto;
 }
-.banner .custom-rich-text-block .vc_sep_line{
+.banner .custom-rich-text-block .vc_sep_line {
   display: none;
+}
+.collapsible {
+  padding: 20px 0px;
+  text-align: center;
+}
+
+.collapsible .button {
+  font-size: 20px;
+  /* border: 0; */
+  box-sizing: border-box;
+  border: none;
+  padding: 12px 12px;
+  background-color: #f37042;
+  border-radius: 3px;
+  margin: auto;
+  color: #fff;
+  width: 55%;
+}
+.collapsible .button span {
+  margin-left: 35px;
+  /* margin-top: 8px; */
+  font-size: 25px;
+}
+.collapsible .title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.collapsible .Content {
+  text-align: justify;
+  font-family: "Merriweather", Sans-serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  line-height: 2em;
+  color: #f37042;
+  background: #fff;
+}
+.collaps-program {
+  padding: 50px 0;
+  background-color: rgba(231, 10, 10, 0.04);
+}
+.collapsible .button {
+  margin: 5px 0px;
+  border: 1px solid;
+  cursor: pointer;
+}
+.activ.collapsible,
+.collapsible .button:hover {
+  background: #00a878;
+  box-shadow: 0 0 11px rgba(33, 33, 33, 0.2);
+  transition-duration: 0.5s;
+}
+.collapsible .Content {
+  box-shadow: 0 0 11px rgba(33, 33, 33, 0.2);
+  padding: 20px;
+  /* color: #000; */
+  border: 1px solid #ebebeb;
+  margin: auto;
+  width: 55%;
+}
+.collapsible-bg {
+  background-color: rgba(231, 10, 10, 0.04);
+  padding: 50px 0px;
+}
+.button.expanded {
+  /* Styles for the expanded button */
+  background-color: #f37042;
+}
+
+.Content.expanded-content {
+  /* Styles for the expanded content */
+  background: #00a878;
+}
+.Home-about .home-basic .basicComponent .basicComponent_content {
+  background-color: unset;
+
+  width: 900px;
+  top: 13%;
+  left: 18.5%;
+}
+section.philosophy {
+  margin-top: 0px;
+}
+.Content {
+  max-height: 500px; /* Set a reasonable max-height or adjust as needed */
+  overflow: hidden;
+  transition: max-height 0.3s ease;
 }
 @media (max-width: 820px), (max-width: 1024px) {
   section.director .custom-rich-text-container p {
@@ -652,8 +739,19 @@ section.Milestones .basicComponent {
   .Milestones .custom-rich-text-subheading h2 {
     width: 100%;
   }
+  .collapsible .button {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+  }
+  .collapsible .button span {
+    margin-top: 3px;
+  }
+  .collapsible .Content {
+    width: 100%;
+  }
 }
-@media (max-width: 320px){
+@media (max-width: 320px) {
   .Milestones .vc_sep_line {
     left: 70%;
     width: 10%;

@@ -4,6 +4,7 @@ import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import { BLOCKS } from "@contentful/rich-text-types";
 import client from "../client";
 import Aos from "aos";
+import CollapsibleComponent from "../Components/CollapsibleComponent"
 const Program = () => {
   const { slug } = useParams();
   const [backgroundImage, setBackgroundImage] = useState("");
@@ -126,7 +127,10 @@ const Program = () => {
                     </section>
                   </React.Fragment>
                 );
+                
+                
               }  // WHY THIS PROGRAM section below section
+              
               else if (pageType === "Program" && type === "program-details") {
                 return (
                   <React.Fragment key={component.sys.id}>
@@ -167,6 +171,7 @@ const Program = () => {
                   </React.Fragment>
                 );
               }
+            
               // what-is-this-program section
               else if (
                 pageType === "Program" &&
@@ -185,11 +190,14 @@ const Program = () => {
                         </div>
                       </div>
                     </section>
+                    <CollapsibleComponent/>
                   </React.Fragment>
                 );
               }
+              
               // Milestones section
               else if (pageType === "Program" && type === "Milestones") {
+                
                 return (
                   <React.Fragment key={component.sys.id}>
                     <section className="Milestones">
@@ -237,6 +245,7 @@ const Program = () => {
           </React.Fragment>
         );
       })}
+      
     </>
   );
 };

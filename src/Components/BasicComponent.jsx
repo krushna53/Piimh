@@ -28,8 +28,9 @@ const BasicComponent = () => {
   return (
     <>
       <section className="Home-about">
+        <div className="home-basic">
         {entry.map((item) => {
-          const { title, description, subTitle, bgColor, ctaButton, link } =
+          const { title, description, subTitle, bgColor, ctaButton, link,hideTitleAndSubtitle } =
             item.fields;
           console.log(item.fields);
           const id = item.sys.id;
@@ -42,8 +43,16 @@ const BasicComponent = () => {
               >
                 <div className="container">
                   <div className="basicComponent_wrapper">
-                    <h2  data-aos="fade-right" data-aos-offset="200">{title}</h2>
-                    <h3  data-aos="fade-left" data-aos-offset="200">{subTitle}</h3>
+                  {!hideTitleAndSubtitle && (
+                <h2 data-aos="fade-right" data-aos-offset="200">
+                  {title}
+                </h2>
+              )}
+              {!hideTitleAndSubtitle && (
+                <h3 data-aos="fade-left" data-aos-offset="200">
+                  {subTitle}
+                </h3>
+              )}
                     <div className="basicComponent_content"  data-aos="fade-right" data-aos-offset="200">
                       {richTextContent}
                       <a href={link} className="cta-button">
@@ -57,6 +66,7 @@ const BasicComponent = () => {
             </React.Fragment>
           );
         })}
+        </div>
       </section>
     </>
   );

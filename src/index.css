@@ -34,7 +34,7 @@ header {
 }
 
 .logo img {
-  width: 100%;
+  width:120px;
   height: 100%;
   /* Adjust the width as needed */
 }
@@ -730,7 +730,7 @@ section.what-is-this-program .divider-separator {
     height: 100%;
   }
   .Home-about .basicComponent .basicComponent_content {
-    width: 100%;
+    width: 100% !important;
     height: 100%;
     margin: auto;
     position: unset;
