@@ -27,7 +27,7 @@ const Header = () => {
         <div className="container">
           <div className="d-flex">
             <div className="logo">
-              <img src="main-logo.png" alt="Logo" />
+              <img src="logo.png" alt="Logo" />
             </div>
             <div className="humber_menu" onClick={toggleMenu}>
               <i className="fas fa-bars"></i>
