@@ -110,7 +110,7 @@ const Program = () => {
               if (pageType === "Program" && type === "program-program") {
                 return (
                   <React.Fragment key={component.sys.id}>
-                    <section className="program">
+                    {/* <section className="program">
                       <div className="basicComponent">
                         <div className="container">
                           <div className="title_subtitle">
@@ -124,7 +124,7 @@ const Program = () => {
                           </div>
                         </div>
                       </div>
-                    </section>
+                    </section> */}
                   </React.Fragment>
                 );
                 
@@ -134,20 +134,20 @@ const Program = () => {
               else if (pageType === "Program" && type === "program-details") {
                 return (
                   <React.Fragment key={component.sys.id}>
-                    <section className="program-details">
+                    {/* <section className="program-details">
                       <div className="basicComponent">
                         <div className="container">
-                          {/* <div className="title_subtitle">
+                          <div className="title_subtitle">
                             <p>{subTitle}</p>
                             <h2>{componentTitle}</h2>
                             <span className="vc_sep_line"></span>
-                          </div> */}
+                          </div>
                           <div className="basicComponent_content">
                             {renderRichText(component.fields.description)}
                           </div>
                         </div>
                       </div>
-                    </section>
+                    </section> */}
                   </React.Fragment>
                 );
               } else if (component.sys.contentType.sys.id === "bannerSection") {
@@ -179,7 +179,7 @@ const Program = () => {
               ) {
                 return (
                   <React.Fragment key={component.sys.id}>
-                    <section className="what-is-this-program">
+                    {/* <section className="what-is-this-program">
                       <div className="basicComponent">
                         <div className="container">
                           <h2 data-aos="fade-left" data-aos-offset="200">{componentTitle}</h2>
@@ -189,7 +189,7 @@ const Program = () => {
                           </div>
                         </div>
                       </div>
-                    </section>
+                    </section> */}
                     <CollapsibleComponent/>
                   </React.Fragment>
                 );
@@ -200,7 +200,7 @@ const Program = () => {
                 
                 return (
                   <React.Fragment key={component.sys.id}>
-                    <section className="Milestones">
+                    {/* <section className="Milestones">
                       <div className="basicComponent">
                         <div className="container">
                         <div className="title_subtitle">
@@ -214,7 +214,7 @@ const Program = () => {
                         
                         </div>
                       </div>
-                    </section>
+                    </section> */}
                   </React.Fragment>
                 );
               }
@@ -222,7 +222,7 @@ const Program = () => {
               else {
                 return (
                   <React.Fragment key={component.sys.id}>
-                    <section className="Home-about">
+                    {/* <section className="Home-about">
                       <div
                         className="basicComponent"
                         style={{ backgroundColor: bgColor }}
@@ -237,7 +237,7 @@ const Program = () => {
                           </div>
                         </div>
                       </div>
-                    </section>
+                    </section> */}
                   </React.Fragment>
                 );
               }
