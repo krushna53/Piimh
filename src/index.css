@@ -680,6 +680,9 @@ section.what-is-this-program .divider-separator {
 .brochure a:hover{
   color: #00a878;
 }
+.collapsible .Content a{
+  color: #f37042 !important;
+}
 /* Mobile menu styles */
 @media screen and (min-width:1500px) and (max-width: 1600px){ 
   .Home-about .basicComponent .basicComponent_content {
