@@ -249,7 +249,7 @@ const Program = () => {
       })}
       <div className="brochure">
         <div className="container">
-      <a href="/practitioner-certification-training-program-in-psychotherapy">Practitioner Certification Training Program in Psychotherapy</a>
+      <a href="https://bit.ly/piimh_Psychotherapy_Training" target="_blank" >Practitioner Certification Training Program in Psychotherapy</a>
       </div>
       </div>
     </>
