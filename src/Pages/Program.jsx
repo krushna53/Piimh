@@ -239,13 +239,19 @@ const Program = () => {
                       </div>
                     </section> */}
                   </React.Fragment>
+                  
                 );
               }
             })}
           </React.Fragment>
+          
         );
       })}
-      
+      <div className="brochure">
+        <div className="container">
+      <a href="/practitioner-certification-training-program-in-psychotherapy">Practitioner Certification Training Program in Psychotherapy</a>
+      </div>
+      </div>
     </>
   );
 };

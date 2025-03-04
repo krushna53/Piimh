@@ -653,7 +653,33 @@ section.what-is-this-program .divider-separator {
   font-size: 15px;
   text-decoration: none;
 }
-
+.practitioner-certification-training-program-in-psychotherapy .basicPage {
+  width: 100%;
+}
+.practitioner-certification-training-program-in-psychotherapy .custom-rich-text-block {
+  background: none;
+  width: 100%;
+}
+.practitioner-certification-training-program-in-psychotherapy .basicPage_wrapper h1 {
+  
+  font-size: 32px;
+  
+}
+.brochure{
+  background-color: rgba(231, 10, 10, 0.04);
+    padding: 40px 0px;
+    text-align: center;
+}
+.brochure a{
+  font-size: 22px; 
+  color: #f37042;
+  cursor: pointer;
+  transition: transform 0.3s ease-in;
+  padding: 12px 25px;
+}
+.brochure a:hover{
+  color: #00a878;
+}
 /* Mobile menu styles */
 @media screen and (min-width:1500px) and (max-width: 1600px){ 
   .Home-about .basicComponent .basicComponent_content {
