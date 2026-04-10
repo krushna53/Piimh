@@ -3,12 +3,15 @@ import { v4 as uuidv4 } from "uuid";
 
 const HdfcPaymentForm = () => {
   const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
     amount: "500.00",
-     customerId: "CUST_" + uuidv4(),
+    customerId: "CUST_" + uuidv4(),
     customerEmail: "customer@example.com",
     customerPhone: "9999999999",
     orderId: "ORD_" + uuidv4(),
+    firstName: "",
+    lastName: "",
   });
 
   const startPayment = async () => {
@@ -23,7 +26,7 @@ const HdfcPaymentForm = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(form),
-        },
+        }
       );
 
       const data = await res.json();
@@ -40,9 +43,7 @@ const HdfcPaymentForm = () => {
     }
   };
 
-  const handleChange = (
-   e
-  ) => {
+  const handleChange = (e) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
@@ -53,11 +54,29 @@ const HdfcPaymentForm = () => {
     <div className="page">
       <div className="card">
         <h2>HDFC Payment</h2>
+        <input
+          type="text"
+          name="firstName"
+          placeholder="First Name"
+          value={form.firstName}
+          onChange={handleChange}
+        />
+
+        <input
+          type="text"
+          name="lastName"
+          placeholder="Last Name"
+          value={form.lastName}
+          onChange={handleChange}
+        />
+
         <select name="amount" value={form.amount} onChange={handleChange}>
-          <option value="100.00">100rs</option>
-          <option value="200.00">200rs</option>
-          <option value="500.00">500rs</option>
-          <option value="1000.00">1000rs</option>
+          <option value="100.00">5RS</option>
+          <option value="100.00">10RS</option>
+          <option value="100.00">1000rs</option>
+          <option value="200.00">200RS</option>
+          <option value="500.00">500RS</option>
+          <option value="1000.00">1000RS</option>
         </select>
 
         <input
@@ -83,4 +102,5 @@ const HdfcPaymentForm = () => {
     </div>
   );
 };
+
 export default HdfcPaymentForm;
