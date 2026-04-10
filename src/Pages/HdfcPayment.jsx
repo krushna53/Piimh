@@ -19,7 +19,7 @@ const HdfcPaymentForm = () => {
       setLoading(true);
 
       const res = await fetch(
-        "http://localhost:3001/api/v1/api/hdfc/create-session",
+        "/api/v1/api/hdfc/create-session",
         {
           method: "POST",
           headers: {

@@ -3,6 +3,19 @@ command = "CI='' npm run build"
 publish = "/build"
 base = "/"
 
+[functions]
+directory = "netlify/functions"
+
+[dev]
+port = 8888
+targetPort = 3000
+
+[[redirects]]
+from = "/api/v1/api/hdfc/create-session"
+to = "/.netlify/functions/hdfc-create-session"
+status = 200
+force = true
+
 [[redirects]]
 from = "/*"
 to = "/index.html"
