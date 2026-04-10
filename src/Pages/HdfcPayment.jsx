@@ -1,13 +1,14 @@
 import React, { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 const HdfcPaymentForm = () => {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     amount: "500.00",
-    customerId: "CUST_1001",
+     customerId: "CUST_" + uuidv4(),
     customerEmail: "customer@example.com",
     customerPhone: "9999999999",
-    orderId: "ORD_" + Date.now(),
+    orderId: "ORD_" + uuidv4(),
   });
 
   const startPayment = async () => {
@@ -52,21 +53,12 @@ const HdfcPaymentForm = () => {
     <div className="page">
       <div className="card">
         <h2>HDFC Payment</h2>
-
         <select name="amount" value={form.amount} onChange={handleChange}>
-          <option value="100.00">₹100</option>
-          <option value="200.00">₹200</option>
-          <option value="500.00">₹500</option>
-          <option value="1000.00">₹1000</option>
+          <option value="100.00">100rs</option>
+          <option value="200.00">200rs</option>
+          <option value="500.00">500rs</option>
+          <option value="1000.00">1000rs</option>
         </select>
-
-        <input
-          type="text"
-          name="customerId"
-          placeholder="Customer ID"
-          value={form.customerId}
-          onChange={handleChange}
-        />
 
         <input
           type="email"
