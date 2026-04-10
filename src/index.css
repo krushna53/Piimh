@@ -883,3 +883,65 @@ section.what-is-this-program .divider-separator {
     margin: 10px 13px;
   }
 }
+
+.page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  background: #f3f4f6;
+  padding: 30px 25px;
+  border-radius: 12px;
+  width: 360px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.card select,
+.card input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+/* Focus effect */
+.card input:focus,
+.card select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+/* Button */
+.card button {
+  width: 100%;
+  padding: 12px;
+  background: #1d4ed8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.card button:hover {
+  background: #1e40af;
+}
+
+.card button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
