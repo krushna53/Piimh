@@ -70,7 +70,7 @@ const HdfcPaymentForm = () => {
           onChange={handleChange}
         />
 
-        <select name="amount" value={form.amount} onChange={handleChange}>
+        <select name="amount" value={form.amount} onChange={handleChange} defaultValue="1.00">
           <option value="1.00">₹1</option>
           <option value="5.00">₹5</option>
           <option value="10.00">₹10</option>
