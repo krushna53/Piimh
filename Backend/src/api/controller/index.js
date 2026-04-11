@@ -11,7 +11,10 @@ const createHdfcSession = async (req, res) => {
       firstName,
       lastName,
     } = req.body;
+    const protocol = req.protocol; // http or https
+    const host = req.get('host');
 
+    const fullUrl = `${protocol}://${host}`;
     const payload = {
       order_id: orderId,
       amount: amount,
@@ -21,7 +24,7 @@ const createHdfcSession = async (req, res) => {
       payment_page_client_id: "hdfcmaster",
       action: "paymentPage",
       currency: "INR",
-      return_url: "https://shop.merchant.com",
+      return_url: `${ fullUrl }`+ "/payment",
       description: "Complete your payment",
       first_name: firstName,
       last_name: lastName,
@@ -30,14 +33,14 @@ const createHdfcSession = async (req, res) => {
     console.log(31, payload);
 
     const response = await axios.post(
-      "https://smartgateway.hdfcuat.bank.in/session",
+      `${ process.env.HDFC_BASE_URL }` + "/session",
       payload,
       {
         headers: {
           "Content-Type": "application/json",
-          "x-merchantid": "SG4356",
-          "x-customerid": "rdhmkl",
-          Authorization: "Basic MjMzQTJBRjQ2REI0NTNCOTQ0Q0JBMUFCNDlGOTIyOg==",
+          "x-merchantid": process.env.HDFC_MERCHANT_ID,
+          "x-customerid": process.env.HDFC_CUSTOMER_ID,
+          Authorization: process.env.HDFC_AUTH_HEADER,
         },
       },
     );
