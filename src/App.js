@@ -10,6 +10,8 @@ import './style.css'
 import '../src/dist/aos.css'
 import Program from "./Pages/Program";
 import HdfcPaymentForm from "./Pages/HdfcPayment";
+import PaymentStatus from "./Pages/PaymentStatus";
+
 function App() {
   return (
     <>
@@ -21,6 +23,7 @@ function App() {
         <Route exact path='/' element={<Home />} />
         <Route exact path='/contact' element={<Contact />} />
         <Route exact path='/payment' element={<HdfcPaymentForm />} />
+        <Route exact path='/payment-status' element={<PaymentStatus />} />
       </Routes>
       <StayConnected/>
       <Footer />
