@@ -11,8 +11,14 @@ port = 8888
 targetPort = 3000
 
 [[redirects]]
-from = "/api/v1/api/hdfc/create-session"
+from = "/api/v1/hdfc/create-session"
 to = "/.netlify/functions/hdfc-create-session"
+status = 200
+force = true
+
+[[redirects]]
+from = "/api/v1/hdfc/transaction-log/*"
+to = "/.netlify/functions/hdfc-transaction-log"
 status = 200
 force = true
 
