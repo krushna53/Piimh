@@ -223,17 +223,54 @@ const HdfcPaymentForm = () => {
       alert("Please fill in all fields before proceeding.");
       return;
     }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.customerEmail)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    // Validate phone (at least 10 digits)
+    if (form.customerPhone.replace(/\D/g, "").length < 10) {
+      alert("Please enter a valid phone number.");
+      return;
+    }
+
     try {
       setLoading(true);
-      const res = await fetch("/api/v1/api/hdfc/create-session", {
+      console.log(" Initiating payment session:", form.orderId);
+
+      const res = await fetch("/api/v1/hdfc/create-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          amount: parseFloat(form.amount), // Ensure amount is a number
+        }),
       });
+
       const data = await res.json();
-      if (!res.ok) throw new Error("Payment initiation failed");
+
+      if (!res.ok) {
+        throw new Error(data.message || "Payment initiation failed");
+      }
+
+      if (!data.paymentLink) {
+        throw new Error("No payment link received from server");
+      }
+
+      console.log(" Payment session created:", data.orderId);
+      console.log(" Redirecting to HDFC payment page...");
+
+      // Store orderId in sessionStorage for reference after callback
+      sessionStorage.setItem("pendingOrderId", form.orderId);
+      sessionStorage.setItem("pendingAmount", form.amount);
+
+      // Redirect to HDFC payment page
       window.location.href = data.paymentLink;
     } catch (err) {
+      console.error("Payment error:", err);
       alert(err.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
