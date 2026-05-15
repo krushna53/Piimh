@@ -240,39 +240,79 @@ const HdfcPaymentForm = () => {
 
     try {
       setLoading(true);
-      console.log(" Initiating payment session:", form.orderId);
+      console.log("=== HDFC Payment Initiation Started ===");
+      console.log("Order ID:", form.orderId);
+      console.log("Amount:", form.amount);
+      console.log("Customer Email:", form.customerEmail);
+      console.log("Customer Phone:", form.customerPhone);
+      console.log("Payment Request Payload:", JSON.stringify({
+        ...form,
+        amount: parseFloat(form.amount),
+      }, null, 2));
 
+      const requestPayload = {
+        ...form,
+        amount: parseFloat(form.amount), // Ensure amount is a number
+      };
+
+      console.log("Sending POST request to /api/v1/hdfc/create-session");
       const res = await fetch("/api/v1/hdfc/create-session", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          amount: parseFloat(form.amount), // Ensure amount is a number
-        }),
+        headers: { 
+          "Content-Type": "application/json" 
+        },
+        body: JSON.stringify(requestPayload),
       });
 
-      const data = await res.json();
+      console.log("Response Status:", res.status, res.statusText);
+      console.log("Response Headers:", {
+        "Content-Type": res.headers.get("Content-Type"),
+      });
 
-      if (!res.ok) {
-        throw new Error(data.message || "Payment initiation failed");
+      let data;
+      try {
+        data = await res.json();
+        console.log("✓ Response parsed successfully:", JSON.stringify(data, null, 2));
+      } catch (parseErr) {
+        console.error("✗ Failed to parse response JSON:", parseErr.message);
+        console.error("Response text:", res.statusText);
+        throw new Error(`Invalid response format: ${parseErr.message}`);
       }
 
+      if (!res.ok) {
+        console.error("✗ Server returned error status:", res.status);
+        console.error("Error details:", data);
+        throw new Error(data.message || data.error?.message || `Payment initiation failed (Status: ${res.status})`);
+      }
+
+      console.log("✓ Server returned success");
+
       if (!data.paymentLink) {
+        console.error("✗ No payment link in response");
+        console.error("Response data:", data);
         throw new Error("No payment link received from server");
       }
 
-      console.log(" Payment session created:", data.orderId);
-      console.log(" Redirecting to HDFC payment page...");
+      console.log("✓ Payment link extracted");
+      console.log("Payment Link:", data.paymentLink.substring(0, 50) + "...");
+      console.log("✓ Payment session created:", data.orderId);
+      console.log("✓ Redirecting to HDFC payment page...");
 
       // Store orderId in sessionStorage for reference after callback
       sessionStorage.setItem("pendingOrderId", form.orderId);
       sessionStorage.setItem("pendingAmount", form.amount);
 
-      // Redirect to HDFC payment page
-      window.location.href = data.paymentLink;
+      // Small delay to allow logs to be visible before redirect
+      setTimeout(() => {
+        window.location.href = data.paymentLink;
+      }, 500);
     } catch (err) {
-      console.error("Payment error:", err);
-      alert(err.message || "Something went wrong. Please try again.");
+      console.error("=== PAYMENT ERROR ===");
+      console.error("Error Type:", err.constructor.name);
+      console.error("Error Message:", err.message);
+      console.error("Full Error:", err);
+      console.error("Stack Trace:", err.stack);
+      alert(`❌ Payment Error: ${err.message || "Something went wrong. Please try again."}\n\nCheck console for details.`);
     } finally {
       setLoading(false);
     }
