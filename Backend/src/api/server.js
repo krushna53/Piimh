@@ -1,4 +1,16 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, "../../../.env") });
+
+// Verify HDFC environment variables are loaded
+console.log("=== Environment Variables Check ===");
+console.log("✓ HDFC_BASE_URL:", process.env.HDFC_BASE_URL || "❌ MISSING");
+console.log("✓ HDFC_MERCHANT_ID:", process.env.HDFC_MERCHANT_ID || "❌ MISSING");
+console.log("✓ HDFC_CUSTOMER_ID:", process.env.HDFC_CUSTOMER_ID || "❌ MISSING");
+console.log("✓ HDFC_AUTH_HEADER:", process.env.HDFC_AUTH_HEADER ? "✓ SET" : "❌ MISSING");
+console.log("✓ FIREBASE_PROJECT_ID:", process.env.FIREBASE_PROJECT_ID || "❌ MISSING");
+console.log("✓ FIREBASE_PRIVATE_KEY:", process.env.FIREBASE_PRIVATE_KEY ? "✓ SET" : "❌ MISSING");
+console.log("====================================\n");
+
 const express = require("express");
 const cors = require("cors");
 // const routes = require("/src/api/routes");

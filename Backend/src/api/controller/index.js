@@ -146,6 +146,12 @@ const createHdfcSession = async (req, res) => {
     };
 
     console.log(`ℹ️ Creating HDFC session for [${orderId}]`);
+    console.log("HDFC Request Details:");
+    console.log("  Base URL:", process.env.HDFC_BASE_URL);
+    console.log("  Merchant ID:", process.env.HDFC_MERCHANT_ID);
+    console.log("  Customer ID:", process.env.HDFC_CUSTOMER_ID);
+    console.log("  Auth Header Set:", !!process.env.HDFC_AUTH_HEADER);
+    console.log("  Full URL:", `${process.env.HDFC_BASE_URL}/session`);
 
     const response = await axios.post(
       `${process.env.HDFC_BASE_URL}/session`,
@@ -169,7 +175,23 @@ const createHdfcSession = async (req, res) => {
     });
   } catch (error) {
     const orderId = req.body?.orderId;
-    console.error(`Session creation failed for [${orderId}]:`, error.message);
+    console.error(`❌ Session creation failed for [${orderId}]`);
+    console.error("Error Details:");
+    console.error("  Type:", error.constructor.name);
+    console.error("  Message:", error.message);
+    
+    if (error.response) {
+      console.error("  HDFC Response Status:", error.response.status);
+      console.error("  HDFC Response Headers:", JSON.stringify(error.response.headers, null, 2));
+      console.error("  HDFC Response Data:", JSON.stringify(error.response.data, null, 2));
+      console.error("  Request Config URL:", error.config?.url);
+      console.error("  Request Config Headers:", JSON.stringify(error.config?.headers, null, 2));
+    } else if (error.request) {
+      console.error("  Request was made but no response received");
+      console.error("  Request details:", error.request);
+    } else {
+      console.error("  Error setting up the request:", error.message);
+    }
 
     // Log as "Failed" only if it's a session creation error (not HDFC API error)
     if (orderId && req.body?.amount) {
@@ -188,10 +210,11 @@ const createHdfcSession = async (req, res) => {
       });
     }
 
-    return res.status(500).json({
+    return res.status(error.response?.status || 500).json({
       success: false,
       message: error.response?.data?.message || error.message || "Unable to create payment session",
       orderId: orderId,
+      error: error.response?.data || { message: error.message },
     });
   }
 };
