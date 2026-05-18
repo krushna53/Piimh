@@ -11,6 +11,36 @@ const PaymentStatus = () => {
   useEffect(() => {
     const checkPaymentStatus = async () => {
       try {
+        const errorCode = searchParams.get("error");
+        const errorMessage = searchParams.get("message");
+
+        if (errorCode) {
+          setStatus("failed");
+          setError(
+            errorCode === "invalid_callback"
+              ? "Payment was canceled or the gateway returned an incomplete callback."
+              : errorMessage || "Payment could not be completed."
+          );
+          return;
+        }
+
+        const mockMode = searchParams.get("mock");
+
+        if (mockMode === "success") {
+          const orderId =
+            searchParams.get("order_id") || sessionStorage.getItem("pendingOrderId");
+          const amount = searchParams.get("amount") || sessionStorage.getItem("pendingAmount") || "N/A";
+
+          setOrderDetails({
+            orderId,
+            amount,
+            status: "Success",
+            responseHash: "MOCK-TRANSACTION",
+          });
+          setStatus("success");
+          return;
+        }
+
         // Get order ID from URL params or sessionStorage
         const orderId =
           searchParams.get("order_id") || sessionStorage.getItem("pendingOrderId");

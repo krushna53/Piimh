@@ -1,177 +1,142 @@
 const admin = require("firebase-admin");
+const fs = require("fs");
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "../../../.env") });
 
 // Initialize Firebase Admin SDK
-try {
-  let serviceAccount;
+let firebaseReady = false;
+let db = null;
 
-  // Try to load from individual environment variables first (for Netlify/production)
+try {
+  let serviceAccount = null;
+
+  // Try to load from explicit environment variables (CI / Netlify style)
   if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY) {
     console.log("Loading Firebase credentials from environment variables...");
     serviceAccount = {
       type: process.env.FIREBASE_TYPE || "service_account",
       project_id: process.env.FIREBASE_PROJECT_ID,
       private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-      private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      private_key: (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n"),
       client_email: process.env.FIREBASE_CLIENT_EMAIL,
       client_id: process.env.FIREBASE_CLIENT_ID,
       auth_uri: process.env.FIREBASE_AUTH_URI,
       token_uri: process.env.FIREBASE_TOKEN_URI,
       auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
       client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
-      universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN || "googleapis.com",
     };
   } else {
-    // Fallback to reading from JSON file (for local development)
-    console.log("Loading Firebase credentials from local JSON file...");
+    // Fallback to local JSON file for development
     const serviceAccountPath = path.join(
       __dirname,
       "piimh-1e1aa-firebase-adminsdk-fbsvc-fd8e0c4174.json"
     );
-    serviceAccount = require(serviceAccountPath);
+
+    if (fs.existsSync(serviceAccountPath)) {
+      console.log("Loading Firebase credentials from local JSON file...");
+      serviceAccount = require(serviceAccountPath);
+    }
   }
 
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+  if (serviceAccount) {
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
 
-  console.log("Firebase initialized successfully");
+    db = admin.firestore();
+    firebaseReady = true;
+    console.log("Firebase initialized successfully");
+  } else {
+    console.warn("Firebase service account not provided; transaction logging is disabled for this session.");
+  }
 } catch (error) {
-  console.error("Error initializing Firebase:", error.message);
-  process.exit(1);
+  console.warn("Firebase initialization skipped:", error && error.message ? error.message : error);
 }
 
-const db = admin.firestore();
-
 /**
- * Log a transaction to Firestore (Production-Grade)
- * @param {Object} transactionData - Transaction details
- * @param {string} transactionData.orderId - Order ID (required)
- * @param {number} transactionData.amount - Payment amount (required)
- * @param {string} transactionData.status - Status: Pending, Success, Failed (required)
- * @param {string} transactionData.responseHash - Response hash from HDFC
- * @param {Object} transactionData.additionalData - Extra data to store
+ * Log a transaction to Firestore
  */
 const logTransaction = async (transactionData, retries = 3) => {
   try {
+    if (!firebaseReady || !db) {
+      return { success: false, skipped: true, message: "Firebase is not configured" };
+    }
+
     const { orderId, amount, status, responseHash = null, additionalData = {} } = transactionData;
 
-    // Validate required fields (Yoda conditions - prevents accidental assignment)
-    if ("undefined" === typeof orderId || null === orderId) {
-      throw new Error("Missing required field: orderId");
-    }
-    if ("undefined" === typeof amount || null === amount) {
-      throw new Error("Missing required field: amount");
-    }
-    if ("undefined" === typeof status || null === status) {
-      throw new Error("Missing required field: status");
-    }
+    if (typeof orderId === "undefined" || orderId === null) throw new Error("Missing required field: orderId");
+    if (typeof amount === "undefined" || amount === null) throw new Error("Missing required field: amount");
+    if (typeof status === "undefined" || status === null) throw new Error("Missing required field: status");
 
-    // Validate amount is a positive number
     const numAmount = Number(amount);
-    if (isNaN(numAmount) || 0 >= numAmount) {
-      throw new Error("Amount must be a positive number");
-    }
+    if (isNaN(numAmount) || numAmount <= 0) throw new Error("Amount must be a positive number");
 
-    // Validate status is one of the allowed values (Yoda condition)
     const validStatuses = ["Pending", "Success", "Failed"];
-    if (!validStatuses.includes(status)) {
-      const validList = validStatuses.join(", ");
-      throw new Error(`Invalid status: "${String(status)}" (allowed: ${validList})`);
-    }
+    if (!validStatuses.includes(status)) throw new Error(`Invalid status: "${String(status)}"`);
 
-    // Create transaction document
     const transactionLog = {
       orderId: String(orderId),
       amount: Number(amount),
-      status: status,
+      status,
       responseHash: responseHash || null,
       lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
       ...additionalData,
     };
 
-    // Save to Firestore under 'transactions' collection with merge
-    await db.collection("transactions").doc(String(orderId)).set(
-      transactionLog,
-      { merge: true }
-    );
+    await db.collection("transactions").doc(String(orderId)).set(transactionLog, { merge: true });
 
-    // Also log to transaction history for audit trail
-    await db
-      .collection("transactions")
-      .doc(String(orderId))
-      .collection("history")
-      .add({
-        status: status,
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        details: additionalData,
-      });
+    await db.collection("transactions").doc(String(orderId)).collection("history").add({
+      status,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      details: additionalData,
+    });
 
     console.log(`[${orderId}] Transaction logged: ${status}`);
     return { success: true, orderId: String(orderId) };
   } catch (error) {
-    console.error(`Error logging transaction [${transactionData?.orderId}]: ${error.message}`);
-    
-    // Retry logic for transient errors
-    if (retries > 0 && error.code === "DEADLINE_EXCEEDED") {
+    console.error(`Error logging transaction [${transactionData?.orderId}]: ${error && error.message ? error.message : error}`);
+
+    if (retries > 0 && error && error.code === "DEADLINE_EXCEEDED") {
       console.warn(`Retrying transaction log (${retries} retries left)...`);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       return logTransaction(transactionData, retries - 1);
     }
 
-    return { success: false, error: error.message };
+    return { success: false, error: error && error.message ? error.message : String(error) };
   }
 };
 
-/**
- * Get transaction by Order ID
- * @param {string} orderId - Order ID to retrieve
- */
 const getTransaction = async (orderId) => {
   try {
+    if (!firebaseReady || !db) return { success: false, message: "Firebase is not configured" };
     const docSnapshot = await db.collection("transactions").doc(String(orderId)).get();
-
-    if (!docSnapshot.exists) {
-      return { success: false, message: "Transaction not found" };
-    }
-
+    if (!docSnapshot.exists) return { success: false, message: "Transaction not found" };
     return { success: true, data: docSnapshot.data() };
   } catch (error) {
-    console.error("Error fetching transaction:", error.message);
-    return { success: false, error: error.message };
+    console.error("Error fetching transaction:", error && error.message ? error.message : error);
+    return { success: false, error: error && error.message ? error.message : String(error) };
   }
 };
 
-/**
- * Get all transactions with optional filtering
- * @param {string} status - Filter by status (optional)
- */
 const getAllTransactions = async (status = null) => {
   try {
+    if (!firebaseReady || !db) return { success: false, message: "Firebase is not configured" };
     let query = db.collection("transactions");
-
-    if (status) {
-      query = query.where("status", "==", status);
-    }
-
-    const snapshot = await query.orderBy("timestamp", "desc").limit(100).get();
-
+    if (status) query = query.where("status", "==", status);
+    const snapshot = await query.orderBy("lastUpdated", "desc").limit(100).get();
     const transactions = [];
-    snapshot.forEach((doc) => {
-      transactions.push({ id: doc.id, ...doc.data() });
-    });
-
+    snapshot.forEach((doc) => transactions.push({ id: doc.id, ...doc.data() }));
     return { success: true, count: transactions.length, data: transactions };
   } catch (error) {
-    console.error("Error fetching transactions:", error.message);
-    return { success: false, error: error.message };
+    console.error("Error fetching transactions:", error && error.message ? error.message : error);
+    return { success: false, error: error && error.message ? error.message : String(error) };
   }
 };
 
 module.exports = {
   db,
   admin,
+  firebaseReady,
   logTransaction,
   getTransaction,
   getAllTransactions,

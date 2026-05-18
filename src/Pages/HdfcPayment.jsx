@@ -12,163 +12,25 @@ const AMOUNTS = [
 ];
 
 const styles = {
-  page: {
-    minHeight: "100vh",
-    background: "linear-gradient(135deg, #f0f4ff 0%, #fafbff 60%, #eef2ff 100%)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "2rem 1rem",
-    fontFamily: "'DM Sans', 'Segoe UI', sans-serif",
-  },
-  card: {
-    background: "#ffffff",
-    borderRadius: "20px",
-    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05), 0 24px 48px -8px rgba(26, 63, 170, 0.12)",
-    padding: "2.5rem",
-    width: "100%",
-    maxWidth: "460px",
-  },
-  header: {
-    display: "flex",
-    alignItems: "center",
-    gap: "14px",
-    marginBottom: "2rem",
-  },
-  iconWrap: {
-    width: "48px",
-    height: "48px",
-    borderRadius: "14px",
-    background: "linear-gradient(135deg, #1a3faa 0%, #2952cc 100%)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  brandTitle: {
-    fontSize: "18px",
-    fontWeight: "700",
-    color: "#0f1c3f",
-    margin: 0,
-    letterSpacing: "-0.3px",
-  },
-  brandSub: {
-    fontSize: "13px",
-    color: "#7b8ab8",
-    margin: 0,
-    marginTop: "2px",
-  },
-  divider: {
-    height: "1px",
-    background: "linear-gradient(90deg, #e8ecf8 0%, #f5f6fa 100%)",
-    marginBottom: "1.75rem",
-  },
-  sectionLabel: {
-    fontSize: "11px",
-    fontWeight: "600",
-    color: "#9ba8c5",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    marginBottom: "10px",
-  },
-  amountGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: "8px",
-    marginBottom: "1.75rem",
-  },
-  amtBtn: (selected) => ({
-    padding: "11px 8px",
-    border: selected ? "1.5px solid #1a3faa" : "1.5px solid #e4e8f5",
-    borderRadius: "10px",
-    background: selected ? "#eef2ff" : "#fafbff",
-    color: selected ? "#1a3faa" : "#4a5580",
-    fontSize: "14px",
-    fontWeight: selected ? "700" : "500",
-    cursor: "pointer",
-    transition: "all 0.15s ease",
-    textAlign: "center",
-    outline: "none",
-  }),
-  fieldRow: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "12px",
-  },
-  field: {
-    marginBottom: "14px",
-  },
-  label: {
-    display: "block",
-    fontSize: "11px",
-    fontWeight: "600",
-    color: "#9ba8c5",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    marginBottom: "7px",
-  },
-  input: {
-    width: "100%",
-    padding: "11px 14px",
-    border: "1.5px solid #e4e8f5",
-    borderRadius: "10px",
-    background: "#fafbff",
-    color: "#0f1c3f",
-    fontSize: "14px",
-    outline: "none",
-    transition: "border-color 0.15s, box-shadow 0.15s",
-    boxSizing: "border-box",
-    fontFamily: "inherit",
-  },
-  totalRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "14px 16px",
-    background: "#f4f6ff",
-    borderRadius: "12px",
-    marginBottom: "1.5rem",
-  },
-  totalLabel: {
-    fontSize: "13px",
-    color: "#7b8ab8",
-    fontWeight: "500",
-  },
-  totalAmount: {
-    fontSize: "22px",
-    fontWeight: "700",
-    color: "#1a3faa",
-    letterSpacing: "-0.5px",
-  },
-  payBtn: (loading) => ({
-    width: "100%",
-    padding: "14px",
-    background: loading
-      ? "#6b82c4"
-      : "linear-gradient(135deg, #1a3faa 0%, #2952cc 100%)",
-    color: "#fff",
-    border: "none",
-    borderRadius: "12px",
-    fontSize: "15px",
-    fontWeight: "600",
-    cursor: loading ? "not-allowed" : "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "8px",
-    letterSpacing: "0.01em",
-    transition: "opacity 0.15s, transform 0.1s",
-    outline: "none",
-  }),
-  security: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "6px",
-    marginTop: "14px",
-    fontSize: "12px",
-    color: "#b0b9d4",
-  },
+  page: { display: "flex", justifyContent: "center", padding: "24px" },
+  card: { width: 420, background: "#fff", borderRadius: 12, padding: 20, boxShadow: "0 6px 20px rgba(12,24,60,0.08)" },
+  header: { display: "flex", gap: 12, alignItems: "center", marginBottom: 12 },
+  iconWrap: { width: 44, height: 44, borderRadius: 10, background: "#1a3faa", display: "flex", alignItems: "center", justifyContent: "center" },
+  brandTitle: { fontSize: 16, fontWeight: 700, margin: 0, letterSpacing: "-0.3px" },
+  brandSub: { fontSize: 13, color: "#7b8ab8", margin: 0, marginTop: 2 },
+  divider: { height: 1, background: "linear-gradient(90deg, #e8ecf8 0%, #f5f6fa 100%)", marginBottom: 28 },
+  sectionLabel: { fontSize: 11, fontWeight: 600, color: "#9ba8c5", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 },
+  amountGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 28 },
+  amtBtn: (selected) => ({ padding: "11px 8px", border: selected ? "1.5px solid #1a3faa" : "1.5px solid #e4e8f5", borderRadius: 10, background: selected ? "#eef2ff" : "#fafbff", color: selected ? "#1a3faa" : "#4a5580", fontSize: 14, fontWeight: selected ? 700 : 500, cursor: "pointer" }),
+  fieldRow: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 },
+  field: { marginBottom: 14 },
+  label: { display: "block", fontSize: 11, fontWeight: 600, color: "#9ba8c5", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 7 },
+  input: { width: "100%", padding: "11px 14px", border: "1.5px solid #e4e8f5", borderRadius: 10, background: "#fafbff", color: "#0f1c3f", fontSize: 14, outline: "none" },
+  totalRow: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", background: "#f4f6ff", borderRadius: 12, marginBottom: 24 },
+  totalLabel: { fontSize: 13, color: "#7b8ab8", fontWeight: 500 },
+  totalAmount: { fontSize: 22, fontWeight: 700, color: "#1a3faa", letterSpacing: "-0.5px" },
+  payBtn: (loading) => ({ width: "100%", padding: 14, background: loading ? "#6b82c4" : "linear-gradient(135deg, #1a3faa 0%, #2952cc 100%)", color: "#fff", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer" }),
+  security: { display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 14, fontSize: 12, color: "#b0b9d4" },
 };
 
 const CardIcon = () => (
@@ -206,133 +68,55 @@ const HdfcPaymentForm = () => {
     lastName: "",
   });
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const selectAmount = (value) => {
-    setForm({ ...form, amount: value });
-  };
-
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const selectAmount = (value) => setForm({ ...form, amount: value });
   const formatAmount = (val) => {
-    const num = parseFloat(val);
+    const num = parseFloat(val || "0");
     return "₹" + num.toLocaleString("en-IN");
   };
 
   const startPayment = async () => {
-    if (!form.firstName || !form.lastName || !form.customerEmail || !form.customerPhone) {
-      alert("Please fill in all fields before proceeding.");
-      return;
-    }
-
-    // Validate email format
+    if (!form.firstName || !form.lastName || !form.customerEmail || !form.customerPhone) return alert("Please fill in all fields before proceeding.");
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.customerEmail)) {
-      alert("Please enter a valid email address.");
-      return;
-    }
-
-    // Validate phone (at least 10 digits)
-    if (form.customerPhone.replace(/\D/g, "").length < 10) {
-      alert("Please enter a valid phone number.");
-      return;
-    }
+    if (!emailRegex.test(form.customerEmail)) return alert("Please enter a valid email address.");
+    if (form.customerPhone.replace(/\D/g, "").length < 10) return alert("Please enter a valid phone number.");
 
     try {
       setLoading(true);
-      console.log("=== HDFC Payment Initiation Started ===");
-      console.log("Order ID:", form.orderId);
-      console.log("Amount:", form.amount);
-      console.log("Customer Email:", form.customerEmail);
-      console.log("Customer Phone:", form.customerPhone);
-      console.log("Payment Request Payload:", JSON.stringify({
-        ...form,
-        amount: parseFloat(form.amount),
-      }, null, 2));
-
-      const requestPayload = {
-        ...form,
-        amount: parseFloat(form.amount), // Ensure amount is a number
-      };
-
-      console.log("Sending POST request to /api/v1/hdfc/create-session");
+      const requestPayload = { ...form, amount: parseFloat(form.amount) };
       const res = await fetch("/api/v1/hdfc/create-session", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json" 
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestPayload),
       });
 
-      console.log("Response Status:", res.status, res.statusText);
-      console.log("Response Headers:", {
-        "Content-Type": res.headers.get("Content-Type"),
-      });
-
-      let data;
-      try {
-        data = await res.json();
-        console.log("✓ Response parsed successfully:", JSON.stringify(data, null, 2));
-      } catch (parseErr) {
-        console.error("✗ Failed to parse response JSON:", parseErr.message);
-        console.error("Response text:", res.statusText);
-        throw new Error(`Invalid response format: ${parseErr.message}`);
+      const text = await res.text();
+      let data = {};
+      if (text) {
+        try { data = JSON.parse(text); } catch { data = { message: text }; }
       }
 
-      if (!res.ok) {
-        console.error("✗ Server returned error status:", res.status);
-        console.error("Error details:", data);
-        throw new Error(data.message || data.error?.message || `Payment initiation failed (Status: ${res.status})`);
-      }
+      if (!res.ok) throw new Error(data.message || `Payment initiation failed (Status: ${res.status})`);
+      if (!data.paymentLink) throw new Error("No payment link received from server");
 
-      console.log("✓ Server returned success");
-
-      if (!data.paymentLink) {
-        console.error("✗ No payment link in response");
-        console.error("Response data:", data);
-        throw new Error("No payment link received from server");
-      }
-
-      console.log("✓ Payment link extracted");
-      console.log("Payment Link:", data.paymentLink.substring(0, 50) + "...");
-      console.log("✓ Payment session created:", data.orderId);
-      console.log("✓ Redirecting to HDFC payment page...");
-
-      // Store orderId in sessionStorage for reference after callback
       sessionStorage.setItem("pendingOrderId", form.orderId);
       sessionStorage.setItem("pendingAmount", form.amount);
-
-      // Small delay to allow logs to be visible before redirect
-      setTimeout(() => {
-        window.location.href = data.paymentLink;
-      }, 500);
+      window.location.href = data.paymentLink;
     } catch (err) {
-      console.error("=== PAYMENT ERROR ===");
-      console.error("Error Type:", err.constructor.name);
-      console.error("Error Message:", err.message);
-      console.error("Full Error:", err);
-      console.error("Stack Trace:", err.stack);
-      alert(`❌ Payment Error: ${err.message || "Something went wrong. Please try again."}\n\nCheck console for details.`);
+      console.error(err);
+      alert(`Payment error: ${err.message || err}`);
     } finally {
       setLoading(false);
     }
   };
 
-  const inputStyle = (name) => ({
-    ...styles.input,
-    borderColor: focusedField === name ? "#1a3faa" : "#e4e8f5",
-    boxShadow: focusedField === name ? "0 0 0 3px rgba(26, 63, 170, 0.08)" : "none",
-  });
+  const inputStyle = (name) => ({ ...styles.input, borderColor: focusedField === name ? "#1a3faa" : "#e4e8f5", boxShadow: focusedField === name ? "0 0 0 3px rgba(26,63,170,0.08)" : "none" });
 
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-
-        {/* Header */}
         <div style={styles.header}>
-          <div style={styles.iconWrap}>
-            <CardIcon />
-          </div>
+          <div style={styles.iconWrap}><CardIcon /></div>
           <div>
             <p style={styles.brandTitle}>HDFC Payment</p>
             <p style={styles.brandSub}>Secure checkout · SSL encrypted</p>
@@ -341,147 +125,51 @@ const HdfcPaymentForm = () => {
 
         <div style={styles.divider} />
 
-        {/* Amount Selection */}
-        <div style={{ marginBottom: "1.75rem" }}>
+        <div style={{ marginBottom: 28 }}>
           <p style={styles.sectionLabel}>Select amount</p>
           <div style={styles.amountGrid}>
             {AMOUNTS.map(({ label, value }) => (
-              <button
-                key={value}
-                style={styles.amtBtn(form.amount === value)}
-                onClick={() => selectAmount(value)}
-                onMouseEnter={(e) => {
-                  if (form.amount !== value) {
-                    e.currentTarget.style.borderColor = "#b0bce8";
-                    e.currentTarget.style.background = "#f4f6ff";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (form.amount !== value) {
-                    e.currentTarget.style.borderColor = "#e4e8f5";
-                    e.currentTarget.style.background = "#fafbff";
-                  }
-                }}
-              >
-                {label}
-              </button>
+              <button key={value} style={styles.amtBtn(form.amount === value)} onClick={() => selectAmount(value)}>{label}</button>
             ))}
           </div>
         </div>
 
-        {/* Name Fields */}
         <div style={styles.fieldRow}>
           <div style={styles.field}>
             <label style={styles.label}>First name</label>
-            <input
-              type="text"
-              name="firstName"
-              placeholder="Rahul"
-              value={form.firstName}
-              onChange={handleChange}
-              onFocus={() => setFocusedField("firstName")}
-              onBlur={() => setFocusedField(null)}
-              style={inputStyle("firstName")}
-            />
+            <input name="firstName" value={form.firstName} onChange={handleChange} onFocus={() => setFocusedField("firstName")} onBlur={() => setFocusedField(null)} style={inputStyle("firstName")} />
           </div>
           <div style={styles.field}>
             <label style={styles.label}>Last name</label>
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Sharma"
-              value={form.lastName}
-              onChange={handleChange}
-              onFocus={() => setFocusedField("lastName")}
-              onBlur={() => setFocusedField(null)}
-              style={inputStyle("lastName")}
-            />
+            <input name="lastName" value={form.lastName} onChange={handleChange} onFocus={() => setFocusedField("lastName")} onBlur={() => setFocusedField(null)} style={inputStyle("lastName")} />
           </div>
         </div>
 
-        {/* Email */}
         <div style={styles.field}>
           <label style={styles.label}>Email address</label>
-          <input
-            type="email"
-            name="customerEmail"
-            placeholder="rahul@example.com"
-            value={form.customerEmail}
-            onChange={handleChange}
-            onFocus={() => setFocusedField("customerEmail")}
-            onBlur={() => setFocusedField(null)}
-            style={inputStyle("customerEmail")}
-          />
+          <input name="customerEmail" type="email" value={form.customerEmail} onChange={handleChange} onFocus={() => setFocusedField("customerEmail")} onBlur={() => setFocusedField(null)} style={inputStyle("customerEmail")} />
         </div>
 
-        {/* Phone */}
         <div style={styles.field}>
           <label style={styles.label}>Phone number</label>
-          <input
-            type="tel"
-            name="customerPhone"
-            placeholder="+91 98765 43210"
-            value={form.customerPhone}
-            onChange={handleChange}
-            onFocus={() => setFocusedField("customerPhone")}
-            onBlur={() => setFocusedField(null)}
-            style={inputStyle("customerPhone")}
-          />
+          <input name="customerPhone" type="tel" value={form.customerPhone} onChange={handleChange} onFocus={() => setFocusedField("customerPhone")} onBlur={() => setFocusedField(null)} style={inputStyle("customerPhone")} />
         </div>
 
-        {/* Total Row */}
         <div style={styles.totalRow}>
           <span style={styles.totalLabel}>Total payable</span>
           <span style={styles.totalAmount}>{formatAmount(form.amount)}</span>
         </div>
 
-        {/* Pay Button */}
-        <button
-          style={styles.payBtn(loading)}
-          onClick={startPayment}
-          disabled={loading}
-          onMouseEnter={(e) => {
-            if (!loading) e.currentTarget.style.opacity = "0.9";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = "1";
-          }}
-          onMouseDown={(e) => {
-            if (!loading) e.currentTarget.style.transform = "scale(0.99)";
-          }}
-          onMouseUp={(e) => {
-            e.currentTarget.style.transform = "scale(1)";
-          }}
-        >
-          {loading ? (
-            <>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ animation: "spin 1s linear infinite" }}>
-                <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2" strokeDasharray="32" strokeDashoffset="10" strokeLinecap="round" />
-              </svg>
-              Processing...
-            </>
-          ) : (
-            <>
-              <ShieldIcon />
-              Pay {formatAmount(form.amount)} securely
-            </>
-          )}
-        </button>
+        <button style={styles.payBtn(loading)} onClick={startPayment} disabled={loading}>{loading ? "Processing..." : `Pay ${formatAmount(form.amount)} securely`}</button>
 
-        {/* Security Note */}
         <div style={styles.security}>
           <LockIcon />
           <span>256-bit SSL · PCI DSS compliant · HDFC SmartGateway</span>
         </div>
+
       </div>
 
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      <style>{`\n        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');\n        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }\n      `}</style>
     </div>
   );
 };

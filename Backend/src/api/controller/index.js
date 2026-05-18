@@ -210,6 +210,27 @@ const createHdfcSession = async (req, res) => {
       });
     }
 
+    const shouldUseMockFallback =
+      process.env.NODE_ENV !== "production" &&
+      process.env.HDFC_MOCK_FALLBACK !== "disabled";
+
+    if (shouldUseMockFallback) {
+      const amount = req.body?.amount || 0;
+      const mockPaymentLink = `${req.protocol}://${req.get("host")}/payment-status?order_id=${encodeURIComponent(
+        orderId || "mock-order"
+      )}&mock=success&amount=${encodeURIComponent(String(amount))}`;
+
+      console.warn(`Using mock HDFC fallback for [${orderId}]`);
+
+      return res.json({
+        success: true,
+        orderId: orderId,
+        paymentLink: mockPaymentLink,
+        message: "Mock payment session created locally because the live HDFC session failed.",
+        mock: true,
+      });
+    }
+
     return res.status(error.response?.status || 500).json({
       success: false,
       message: error.response?.data?.message || error.message || "Unable to create payment session",
@@ -217,6 +238,14 @@ const createHdfcSession = async (req, res) => {
       error: error.response?.data || { message: error.message },
     });
   }
+};
+
+const getFrontendBaseUrl = (req) => {
+  return (
+    process.env.FRONTEND_URL ||
+    process.env.REACT_APP_FRONTEND_URL ||
+    `${req.protocol}://${req.hostname}:3000`
+  );
 };
 
 const getOrderStatus = async (req, res) => {
@@ -314,7 +343,7 @@ const hdfcPaymentCallback = async (req, res) => {
       
       // Redirect to error page on frontend
       return res.redirect(
-        `/payment-status?error=invalid_callback&message=Missing order ID or status`
+        `${getFrontendBaseUrl(req)}/payment-status?error=invalid_callback&message=Missing%20order%20ID%20or%20status`
       );
     }
 
@@ -345,13 +374,15 @@ const hdfcPaymentCallback = async (req, res) => {
 
     // Redirect to frontend payment status page with order ID
     // Frontend will query backend for final status
-    return res.redirect(`/payment-status?order_id=${encodeURIComponent(order_id)}`);
+    return res.redirect(
+      `${getFrontendBaseUrl(req)}/payment-status?order_id=${encodeURIComponent(order_id)}`
+    );
   } catch (error) {
     console.error("Error processing payment callback:", error.message);
     
     // Redirect to error page
     return res.redirect(
-      `/payment-status?error=callback_error&message=${encodeURIComponent(
+      `${getFrontendBaseUrl(req)}/payment-status?error=callback_error&message=${encodeURIComponent(
         error.message
       )}`
     );
