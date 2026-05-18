@@ -250,7 +250,16 @@ const HdfcPaymentForm = () => {
         }),
       });
 
-      const data = await res.json();
+      const responseText = await res.text();
+      let data = {};
+
+      if (responseText) {
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          data = { message: responseText };
+        }
+      }
 
       if (!res.ok) {
         throw new Error(data.message || "Payment initiation failed");

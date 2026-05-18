@@ -1,26 +1,33 @@
 const admin = require("firebase-admin");
+const fs = require("fs");
 const path = require("path");
 
 // Initialize Firebase Admin SDK
+let firebaseReady = false;
+let db = null;
+
 try {
   const serviceAccountPath = path.join(
     __dirname,
     "piimh-1e1aa-firebase-adminsdk-fbsvc-fd8e0c4174.json"
   );
 
-  const serviceAccount = require(serviceAccountPath);
+  if (fs.existsSync(serviceAccountPath)) {
+    const serviceAccount = require(serviceAccountPath);
 
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
 
-  console.log("Firebase initialized successfully");
+    db = admin.firestore();
+    firebaseReady = true;
+    console.log("Firebase initialized successfully");
+  } else {
+    console.warn("Firebase service account file not found; transaction logging is disabled for this session.");
+  }
 } catch (error) {
-  console.error("Error initializing Firebase:", error.message);
-  process.exit(1);
+  console.warn("Firebase initialization skipped:", error.message);
 }
-
-const db = admin.firestore();
 
 /**
  * Log a transaction to Firestore (Production-Grade)
@@ -33,6 +40,10 @@ const db = admin.firestore();
  */
 const logTransaction = async (transactionData, retries = 3) => {
   try {
+    if (!firebaseReady || !db) {
+      return { success: false, skipped: true, message: "Firebase is not configured" };
+    }
+
     const { orderId, amount, status, responseHash = null, additionalData = {} } = transactionData;
 
     // Validate required fields (Yoda conditions - prevents accidental assignment)
@@ -108,6 +119,10 @@ const logTransaction = async (transactionData, retries = 3) => {
  */
 const getTransaction = async (orderId) => {
   try {
+    if (!firebaseReady || !db) {
+      return { success: false, message: "Firebase is not configured" };
+    }
+
     const docSnapshot = await db.collection("transactions").doc(String(orderId)).get();
 
     if (!docSnapshot.exists) {
@@ -127,6 +142,10 @@ const getTransaction = async (orderId) => {
  */
 const getAllTransactions = async (status = null) => {
   try {
+    if (!firebaseReady || !db) {
+      return { success: false, message: "Firebase is not configured" };
+    }
+
     let query = db.collection("transactions");
 
     if (status) {
@@ -150,6 +169,7 @@ const getAllTransactions = async (status = null) => {
 module.exports = {
   db,
   admin,
+  firebaseReady,
   logTransaction,
   getTransaction,
   getAllTransactions,
