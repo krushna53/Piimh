@@ -48,13 +48,6 @@ const LockIcon = () => (
   </svg>
 );
 
-const ShieldIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="white" strokeWidth="1.8" strokeLinejoin="round" />
-    <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
 const HdfcPaymentForm = () => {
   const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
@@ -63,6 +56,7 @@ const HdfcPaymentForm = () => {
     customerId: "CUST_" + uuidv4(),
     customerEmail: "",
     customerPhone: "",
+    // orderId is generated fresh each attempt to prevent duplicate submissions
     orderId: "ORD_" + uuidv4(),
     firstName: "",
     lastName: "",
@@ -76,14 +70,43 @@ const HdfcPaymentForm = () => {
   };
 
   const startPayment = async () => {
-    if (!form.firstName || !form.lastName || !form.customerEmail || !form.customerPhone) return alert("Please fill in all fields before proceeding.");
+    if (!form.firstName || !form.lastName || !form.customerEmail || !form.customerPhone) {
+      return alert("Please fill in all fields before proceeding.");
+    }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.customerEmail)) return alert("Please enter a valid email address.");
     if (form.customerPhone.replace(/\D/g, "").length < 10) return alert("Please enter a valid phone number.");
 
     try {
       setLoading(true);
-      const requestPayload = { ...form, amount: parseFloat(form.amount) };
+      const amount = parseFloat(form.amount);
+      const orderId = form.orderId;
+
+      // #2 — Step 1: Register amount server-side to prevent tampering; get back amountHash
+      const initRes = await fetch("/api/v1/hdfc/init-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, amount }),
+      });
+      const initData = await initRes.json();
+
+      if (!initRes.ok || !initData.success) {
+        // #5 — If duplicate orderId, generate a new one and ask user to retry
+        if (initRes.status === 409) {
+          setForm((prev) => ({ ...prev, orderId: "ORD_" + uuidv4() }));
+          return alert("Duplicate order detected. Please try again.");
+        }
+        throw new Error(initData.message || "Failed to initialise payment order");
+      }
+
+      // #2 — Step 2: Submit payment with the server-issued amountHash
+      const requestPayload = {
+        ...form,
+        orderId,
+        amount,
+        amountHash: initData.amountHash,
+      };
+
       const res = await fetch("/api/v1/hdfc/create-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -99,18 +122,24 @@ const HdfcPaymentForm = () => {
       if (!res.ok) throw new Error(data.message || `Payment initiation failed (Status: ${res.status})`);
       if (!data.paymentLink) throw new Error("No payment link received from server");
 
-      sessionStorage.setItem("pendingOrderId", form.orderId);
-      sessionStorage.setItem("pendingAmount", form.amount);
+      sessionStorage.setItem("pendingOrderId", orderId);
+      sessionStorage.setItem("pendingAmount", String(amount));
       window.location.href = data.paymentLink;
     } catch (err) {
       console.error(err);
       alert(`Payment error: ${err.message || err}`);
+      // Generate fresh orderId on any failure so next attempt is not flagged as duplicate
+      setForm((prev) => ({ ...prev, orderId: "ORD_" + uuidv4() }));
     } finally {
       setLoading(false);
     }
   };
 
-  const inputStyle = (name) => ({ ...styles.input, borderColor: focusedField === name ? "#1a3faa" : "#e4e8f5", boxShadow: focusedField === name ? "0 0 0 3px rgba(26,63,170,0.08)" : "none" });
+  const inputStyle = (name) => ({
+    ...styles.input,
+    borderColor: focusedField === name ? "#1a3faa" : "#e4e8f5",
+    boxShadow: focusedField === name ? "0 0 0 3px rgba(26,63,170,0.08)" : "none",
+  });
 
   return (
     <div style={styles.page}>
@@ -160,16 +189,20 @@ const HdfcPaymentForm = () => {
           <span style={styles.totalAmount}>{formatAmount(form.amount)}</span>
         </div>
 
-        <button style={styles.payBtn(loading)} onClick={startPayment} disabled={loading}>{loading ? "Processing..." : `Pay ${formatAmount(form.amount)} securely`}</button>
+        <button style={styles.payBtn(loading)} onClick={startPayment} disabled={loading}>
+          {loading ? "Processing..." : `Pay ${formatAmount(form.amount)} securely`}
+        </button>
 
         <div style={styles.security}>
           <LockIcon />
           <span>256-bit SSL · PCI DSS compliant · HDFC SmartGateway</span>
         </div>
-
       </div>
 
-      <style>{`\n        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');\n        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }\n      `}</style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
 };

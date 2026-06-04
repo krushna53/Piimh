@@ -1,6 +1,9 @@
 const express = require("express");
-const { createHdfcSession, getOrderStatus, getTransactionLog, hdfcPaymentCallback } = require("../controller");
+const { initPaymentOrder, createHdfcSession, getOrderStatus, getTransactionLog, hdfcPaymentCallback } = require("../controller");
 const router = express.Router();
+
+// #2 — Register order amount server-side before payment; returns amountHash
+router.post("/hdfc/init-order", initPaymentOrder);
 
 // Payment initiation
 router.post("/hdfc/create-session", createHdfcSession);

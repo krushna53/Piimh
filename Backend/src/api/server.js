@@ -1,5 +1,5 @@
 const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, "../../.env") });
+require("dotenv").config({ path: path.join(__dirname, "../../../.env") });
 
 // Verify HDFC environment variables are loaded (helpful for local debugging)
 console.log("=== Environment Variables Check ===");

@@ -1,6 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
+const downloadReceipt = (orderDetails) => {
+  const date = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+  const content = [
+    "========================================",
+    "         PRABHAVA IIMH PAYMENT RECEIPT  ",
+    "========================================",
+    `Date/Time   : ${date}`,
+    `Order ID    : ${orderDetails.orderId}`,
+    `Amount      : ₹${orderDetails.amount}`,
+    `Status      : ${orderDetails.status}`,
+    `Transaction : ${orderDetails.responseHash || "N/A"}`,
+    "----------------------------------------",
+    "Thank you for your payment.",
+    "This is a computer-generated receipt.",
+    "========================================",
+  ].join("\n");
+
+  const blob = new Blob([content], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `receipt_${orderDetails.orderId}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 const PaymentStatus = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -136,6 +162,9 @@ const PaymentStatus = () => {
             </div>
           )}
 
+          <button style={styles.downloadBtn} onClick={() => downloadReceipt(orderDetails)}>
+            Download Receipt
+          </button>
           <button style={styles.continueBtn} onClick={() => navigate("/")}>
             Return to Home
           </button>
@@ -400,6 +429,18 @@ const styles = {
     fontSize: "14px",
     fontWeight: "600",
     color: "#0f1c3f",
+  },
+  downloadBtn: {
+    width: "100%",
+    padding: "12px",
+    background: "#ffffff",
+    color: "#1a3faa",
+    border: "1.5px solid #1a3faa",
+    borderRadius: "10px",
+    fontSize: "15px",
+    fontWeight: "600",
+    cursor: "pointer",
+    marginTop: "1rem",
   },
   continueBtn: {
     width: "100%",

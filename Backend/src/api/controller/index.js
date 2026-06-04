@@ -1,25 +1,32 @@
 const axios = require("axios");
+const crypto = require("crypto");
 const { logTransaction, getTransaction } = require("../firebase");
 
-/**
- * Sanitization helper - Remove dangerous characters
- */
+// In-memory store for pending orders: orderId -> { amount, createdAt }
+// Prevents frontend from tampering with the amount between init and submit
+const pendingOrders = new Map();
+
+const HMAC_SECRET = process.env.PAYMENT_HMAC_SECRET || "piimh-payment-secret-change-in-prod";
+
+// #2 — Generate HMAC hash of orderId + amount so backend can verify it wasn't tampered
+const generateAmountHash = (orderId, amount) => {
+  return crypto
+    .createHmac("sha256", HMAC_SECRET)
+    .update(`${orderId}:${amount}`)
+    .digest("hex");
+};
+
 const sanitizeString = (input) => {
   if ("string" !== typeof input) return String(input || "").trim();
   let cleaned = input.trim();
-  // Remove control characters and null bytes
   cleaned = cleaned.replace(/[\x00-\x1F\x7F]/g, "");
   return cleaned;
 };
 
-/**
- * Input validation helper (Production-Grade)
- */
 const validateSessionRequest = (data) => {
   const required = ["orderId", "amount", "customerId", "customerEmail", "customerPhone", "firstName", "lastName"];
   const errors = [];
 
-  // Check required fields (Yoda conditions)
   required.forEach(field => {
     const value = data[field];
     if ("undefined" === typeof value || null === value || "" === String(value).trim()) {
@@ -27,7 +34,6 @@ const validateSessionRequest = (data) => {
     }
   });
 
-  // Sanitize strings
   const sanitized = {
     firstName: sanitizeString(data.firstName),
     lastName: sanitizeString(data.lastName),
@@ -37,88 +43,130 @@ const validateSessionRequest = (data) => {
     customerId: sanitizeString(data.customerId),
   };
 
-  // Validate firstName & lastName (letters, spaces, hyphens only)
   const nameRegex = /^[a-zA-Z\s\-']{1,50}$/;
-  if (sanitized.firstName && !nameRegex.test(sanitized.firstName)) {
-    errors.push("First name contains invalid characters");
-  }
-  if (sanitized.lastName && !nameRegex.test(sanitized.lastName)) {
-    errors.push("Last name contains invalid characters");
-  }
+  if (sanitized.firstName && !nameRegex.test(sanitized.firstName)) errors.push("First name contains invalid characters");
+  if (sanitized.lastName && !nameRegex.test(sanitized.lastName)) errors.push("Last name contains invalid characters");
 
-  // Validate email (strict RFC-like format)
   const emailRegex = /^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  if (sanitized.customerEmail && !emailRegex.test(sanitized.customerEmail)) {
-    errors.push("Invalid email format");
-  }
-  if (sanitized.customerEmail && 254 < sanitized.customerEmail.length) {
-    errors.push("Email too long");
-  }
+  if (sanitized.customerEmail && !emailRegex.test(sanitized.customerEmail)) errors.push("Invalid email format");
+  if (sanitized.customerEmail && 254 < sanitized.customerEmail.length) errors.push("Email too long");
 
-  // Validate phone (10-15 digits)
   const phoneDigits = sanitized.customerPhone.replace(/\D/g, "");
-  if (phoneDigits && (10 > phoneDigits.length || 15 < phoneDigits.length)) {
-    errors.push("Phone must be 10-15 digits");
-  }
-  if (sanitized.customerPhone && !/^[\d+\-\s()]{10,}$/.test(sanitized.customerPhone)) {
-    errors.push("Phone contains invalid characters");
-  }
+  if (phoneDigits && (10 > phoneDigits.length || 15 < phoneDigits.length)) errors.push("Phone must be 10-15 digits");
+  if (sanitized.customerPhone && !/^[\d+\-\s()]{10,}$/.test(sanitized.customerPhone)) errors.push("Phone contains invalid characters");
 
-  // Validate amount is a positive number
   const amount = Number(data.amount);
-  if (isNaN(amount) || 0 >= amount || 999999999 < amount) {
-    errors.push("Amount must be a valid number between 1 and 999999999");
-  }
+  if (isNaN(amount) || 0 >= amount || 999999999 < amount) errors.push("Amount must be a valid number between 1 and 999999999");
 
-  // Validate orderId format
-  if (sanitized.orderId && !/^[a-zA-Z0-9_-]{20,}$/.test(sanitized.orderId)) {
-    errors.push("Invalid order ID format");
-  }
+  if (sanitized.orderId && !/^[a-zA-Z0-9_-]{20,}$/.test(sanitized.orderId)) errors.push("Invalid order ID format");
 
   return { errors, sanitized };
 };
 
-/**
- * Create HDFC Payment Session
- * Flow: Request received → Log as "Pending" → Create HDFC session → Return payment link
- */
+// #4 — Only allow redirects to our own frontend domain
+const ALLOWED_REDIRECT_ORIGINS = [
+  "http://localhost:3000",
+  "https://piimh.com",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+const isAllowedRedirectUrl = (url) => {
+  try {
+    const parsed = new URL(url);
+    return ALLOWED_REDIRECT_ORIGINS.some(origin => {
+      const allowedOrigin = new URL(origin);
+      return parsed.hostname === allowedOrigin.hostname && parsed.protocol === allowedOrigin.protocol;
+    });
+  } catch {
+    return false;
+  }
+};
+
+const getFrontendBaseUrl = (req) => {
+  return (
+    process.env.FRONTEND_URL ||
+    process.env.REACT_APP_FRONTEND_URL ||
+    `${req.protocol}://${req.hostname}:3000`
+  );
+};
+
+// #2 — New endpoint: frontend calls this first to register the order amount server-side
+// Returns a hash the frontend must pass with the payment request
+const initPaymentOrder = (req, res) => {
+  const { orderId, amount } = req.body;
+
+  if (!orderId || !amount) {
+    return res.status(400).json({ success: false, message: "orderId and amount are required" });
+  }
+
+  const numAmount = Number(amount);
+  if (isNaN(numAmount) || numAmount <= 0 || numAmount > 999999999) {
+    return res.status(400).json({ success: false, message: "Invalid amount" });
+  }
+
+  if (!/^[a-zA-Z0-9_-]{20,}$/.test(String(orderId))) {
+    return res.status(400).json({ success: false, message: "Invalid order ID format" });
+  }
+
+  // #5 — Reject if orderId was already used
+  if (pendingOrders.has(orderId)) {
+    return res.status(409).json({ success: false, message: "Duplicate order ID. Please refresh and try again." });
+  }
+
+  pendingOrders.set(orderId, { amount: numAmount, createdAt: Date.now() });
+
+  // Expire pending orders after 30 minutes
+  setTimeout(() => pendingOrders.delete(orderId), 30 * 60 * 1000);
+
+  const amountHash = generateAmountHash(orderId, numAmount);
+  return res.json({ success: true, orderId, amount: numAmount, amountHash });
+};
+
 const createHdfcSession = async (req, res) => {
   try {
-    const { amount } = req.body;
+    const { amountHash } = req.body;
 
-    // Input validation & sanitization
     const { errors: validationErrors, sanitized } = validateSessionRequest(req.body);
     if (validationErrors.length > 0) {
       console.warn(`Validation failed: ${validationErrors.join(", ")}`);
-      return res.status(400).json({
-        success: false,
-        message: "Validation failed",
-        errors: validationErrors,
-      });
+      return res.status(400).json({ success: false, message: "Validation failed", errors: validationErrors });
     }
 
-    // Use sanitized values
     const orderId = sanitized.orderId;
+
+    // #2 — Verify amount was not tampered: check hash and compare against server-side stored amount
+    const pending = pendingOrders.get(orderId);
+    if (!pending) {
+      return res.status(400).json({ success: false, message: "Order not initialised. Please start payment again." });
+    }
+
+    const expectedHash = generateAmountHash(orderId, pending.amount);
+    if (!amountHash || amountHash !== expectedHash) {
+      console.warn(`Amount hash mismatch for [${orderId}]`);
+      return res.status(400).json({ success: false, message: "Payment amount validation failed. Please try again." });
+    }
+
+    // Use server-side stored amount — ignore whatever the frontend sent
+    const verifiedAmount = pending.amount;
+
+    // #5 — Mark order as in-flight to prevent duplicate submissions
+    pendingOrders.set(orderId, { ...pending, submitting: true });
+
     const firstName = sanitized.firstName;
     const lastName = sanitized.lastName;
     const customerEmail = sanitized.customerEmail;
     const customerPhone = sanitized.customerPhone;
     const customerId = sanitized.customerId;
 
-    const protocol = req.protocol;
-    const host = req.get('host');
-    const fullUrl = `${protocol}://${host}`;
-
-    // Log initial attempt as "Pending"
     const logResult = await logTransaction({
-      orderId: orderId,
-      amount: amount,
+      orderId,
+      amount: verifiedAmount,
       status: "Pending",
       responseHash: null,
       additionalData: {
-        customerId: customerId,
-        customerEmail: customerEmail,
-        customerPhone: customerPhone,
+        customerId,
+        customerEmail,
+        customerPhone,
         sessionInitiated: true,
         source: "create-session",
       },
@@ -126,20 +174,20 @@ const createHdfcSession = async (req, res) => {
 
     if (!logResult.success) {
       console.warn(`Warning: Failed to log initial transaction for [${orderId}], but continuing...`);
-      // Don't fail the entire request if logging fails (fail-open for payments)
     }
 
-    // Prepare HDFC payload
+    const returnUrl = `${req.protocol}://${req.get("host")}/api/v1/hdfc/payment-callback`;
+
     const payload = {
       order_id: orderId,
-      amount: amount,
+      amount: verifiedAmount,
       customer_id: customerId,
       customer_email: customerEmail,
       customer_phone: customerPhone,
       payment_page_client_id: "hdfcmaster",
       action: "paymentPage",
       currency: "INR",
-      return_url: `${fullUrl}/api/v1/hdfc/payment-callback`, // Webhook endpoint
+      return_url: returnUrl,
       description: "Complete your payment",
       first_name: firstName,
       last_name: lastName,
@@ -151,7 +199,6 @@ const createHdfcSession = async (req, res) => {
     console.log("  Merchant ID:", process.env.HDFC_MERCHANT_ID);
     console.log("  Customer ID:", process.env.HDFC_CUSTOMER_ID);
     console.log("  Auth Header Set:", !!process.env.HDFC_AUTH_HEADER);
-    console.log("  Full URL:", `${process.env.HDFC_BASE_URL}/session`);
 
     const response = await axios.post(
       `${process.env.HDFC_BASE_URL}/session`,
@@ -162,41 +209,41 @@ const createHdfcSession = async (req, res) => {
           "x-merchantid": process.env.HDFC_MERCHANT_ID,
           "x-customerid": process.env.HDFC_CUSTOMER_ID,
           Authorization: process.env.HDFC_AUTH_HEADER,
+          // "x-api": process.env.HDFC_API_KEY,
         },
-        timeout: 10000, // 10 second timeout
+        timeout: 10000,
       }
     );
 
+    // Remove from pending — HDFC accepted it
+    pendingOrders.delete(orderId);
+
     return res.json({
       success: true,
-      orderId: orderId,
+      orderId,
       paymentLink: response.data.payment_links?.web || response.data.payment_link,
       message: "Payment session created successfully",
     });
   } catch (error) {
     const orderId = req.body?.orderId;
     console.error(`❌ Session creation failed for [${orderId}]`);
-    console.error("Error Details:");
     console.error("  Type:", error.constructor.name);
     console.error("  Message:", error.message);
-    
+
     if (error.response) {
       console.error("  HDFC Response Status:", error.response.status);
-      console.error("  HDFC Response Headers:", JSON.stringify(error.response.headers, null, 2));
       console.error("  HDFC Response Data:", JSON.stringify(error.response.data, null, 2));
-      console.error("  Request Config URL:", error.config?.url);
-      console.error("  Request Config Headers:", JSON.stringify(error.config?.headers, null, 2));
-    } else if (error.request) {
-      console.error("  Request was made but no response received");
-      console.error("  Request details:", error.request);
-    } else {
-      console.error("  Error setting up the request:", error.message);
     }
 
-    // Log as "Failed" only if it's a session creation error (not HDFC API error)
+    // Remove submitting lock on failure so user can retry
+    if (orderId && pendingOrders.has(orderId)) {
+      const existing = pendingOrders.get(orderId);
+      pendingOrders.set(orderId, { ...existing, submitting: false });
+    }
+
     if (orderId && req.body?.amount) {
       await logTransaction({
-        orderId: orderId,
+        orderId,
         amount: req.body.amount,
         status: "Failed",
         responseHash: null,
@@ -216,7 +263,8 @@ const createHdfcSession = async (req, res) => {
 
     if (shouldUseMockFallback) {
       const amount = req.body?.amount || 0;
-      const mockPaymentLink = `${req.protocol}://${req.get("host")}/payment-status?order_id=${encodeURIComponent(
+      const frontendBase = getFrontendBaseUrl(req);
+      const mockPaymentLink = `${frontendBase}/payment-status?order_id=${encodeURIComponent(
         orderId || "mock-order"
       )}&mock=success&amount=${encodeURIComponent(String(amount))}`;
 
@@ -224,7 +272,7 @@ const createHdfcSession = async (req, res) => {
 
       return res.json({
         success: true,
-        orderId: orderId,
+        orderId,
         paymentLink: mockPaymentLink,
         message: "Mock payment session created locally because the live HDFC session failed.",
         mock: true,
@@ -234,30 +282,18 @@ const createHdfcSession = async (req, res) => {
     return res.status(error.response?.status || 500).json({
       success: false,
       message: error.response?.data?.message || error.message || "Unable to create payment session",
-      orderId: orderId,
+      orderId,
       error: error.response?.data || { message: error.message },
     });
   }
 };
 
-const getFrontendBaseUrl = (req) => {
-  return (
-    process.env.FRONTEND_URL ||
-    process.env.REACT_APP_FRONTEND_URL ||
-    `${req.protocol}://${req.hostname}:3000`
-  );
-};
-
 const getOrderStatus = async (req, res) => {
   const orderId = req.query.orderId;
-  
+
   try {
-    // Validate orderId
     if (!orderId) {
-      return res.status(400).json({
-        success: false,
-        message: "Order ID is required",
-      });
+      return res.status(400).json({ success: false, message: "Order ID is required" });
     }
 
     console.log(`ℹ️ Checking HDFC status for [${orderId}]`);
@@ -267,7 +303,7 @@ const getOrderStatus = async (req, res) => {
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: "Basic RDFEN0RCN0ZBQUI0NUNFQjQyNDczN0YzODYyQjlBOg==",
+          Authorization: process.env.HDFC_AUTH_HEADER,
         },
         timeout: 10000,
       }
@@ -277,17 +313,12 @@ const getOrderStatus = async (req, res) => {
     const isSuccess = ["success", "paid", "captured"].includes(hdfcStatus.toLowerCase());
     const logStatus = isSuccess ? "Success" : "Failed";
 
-    // Log the status check result
     await logTransaction({
       orderId: response.data.order_id || orderId,
       amount: response.data.amount || 0,
       status: logStatus,
       responseHash: response.data.response_hash || response.data.hash || null,
-      additionalData: {
-        hdfcStatus: hdfcStatus,
-        source: "status-check",
-        statusCheckAt: new Date().toISOString(),
-      },
+      additionalData: { hdfcStatus, source: "status-check", statusCheckAt: new Date().toISOString() },
     });
 
     return res.json({
@@ -298,60 +329,74 @@ const getOrderStatus = async (req, res) => {
     });
   } catch (error) {
     console.error(`Status check failed for [${orderId}]:`, error.message);
-
-    // Log status check failure
     if (orderId) {
       await logTransaction({
-        orderId: orderId,
+        orderId,
         amount: 0,
         status: "Failed",
         responseHash: null,
-        additionalData: {
-          errorType: "STATUS_CHECK_FAILED",
-          errorMessage: error.message,
-          source: "status-check",
-        },
+        additionalData: { errorType: "STATUS_CHECK_FAILED", errorMessage: error.message, source: "status-check" },
       });
     }
-
-    return res.status(500).json({
-      success: false,
-      message: "Failed to check payment status",
-      orderId: orderId,
-    });
+    return res.status(500).json({ success: false, message: "Failed to check payment status", orderId });
   }
 };
 
-/**
- * HDFC Payment Callback Webhook
- * Called by HDFC after user completes/cancels payment
- * This is the PRIMARY source of truth for payment status
- * 
- * Flow: HDFC redirects user here → We log the response → Redirect to frontend status page
- */
+// #3 — Validate HDFC callback response hash to prevent response tampering
+const verifyCallbackHash = (hdfcResponse) => {
+  const { hash, order_id, status, amount } = hdfcResponse;
+  if (!hash) return false;
+
+  // HDFC hash = SHA256(orderId + "|" + status + "|" + amount + "|" + apiKey)
+  const apiKey = process.env.HDFC_API_KEY || "";
+  const expectedHash = crypto
+    .createHash("sha256")
+    .update(`${order_id}|${status}|${amount}|${apiKey}`)
+    .digest("hex");
+
+  return crypto.timingSafeEqual(
+    Buffer.from(hash.toLowerCase()),
+    Buffer.from(expectedHash.toLowerCase())
+  );
+};
+
 const hdfcPaymentCallback = async (req, res) => {
   try {
-    // HDFC may send data in query params or body depending on their implementation
     const hdfcResponse = { ...req.query, ...req.body };
     const { order_id, status, amount, hash } = hdfcResponse;
 
     console.log(`📨 Payment callback received for [${order_id}] - Status: ${status}`);
 
-    // Validate callback data
     if (!order_id || !status) {
       console.warn("Incomplete callback data:", hdfcResponse);
-      
-      // Redirect to error page on frontend
       return res.redirect(
         `${getFrontendBaseUrl(req)}/payment-status?error=invalid_callback&message=Missing%20order%20ID%20or%20status`
       );
     }
 
-    // Determine if payment was successful
+    // #3 — Verify the response hash from HDFC to ensure it wasn't tampered
+    const hashValid = verifyCallbackHash(hdfcResponse);
+    if (hash && !hashValid) {
+      console.error(`❌ Hash mismatch for callback [${order_id}] — possible response tampering`);
+      await logTransaction({
+        orderId: order_id,
+        amount: amount || 0,
+        status: "Failed",
+        responseHash: hash || null,
+        additionalData: {
+          errorType: "HASH_MISMATCH",
+          source: "payment-callback",
+          callbackAt: new Date().toISOString(),
+        },
+      });
+      return res.redirect(
+        `${getFrontendBaseUrl(req)}/payment-status?error=hash_mismatch&message=Response%20validation%20failed`
+      );
+    }
+
     const isSuccess = ["success", "paid", "captured"].includes(status.toLowerCase());
     const logStatus = isSuccess ? "Success" : "Failed";
 
-    // Log the callback response (this updates from Pending to Success/Failed)
     const logResult = await logTransaction({
       orderId: order_id,
       amount: amount || 0,
@@ -362,68 +407,54 @@ const hdfcPaymentCallback = async (req, res) => {
         source: "payment-callback",
         callbackAt: new Date().toISOString(),
         fullResponse: hdfcResponse,
+        hashVerified: hashValid,
       },
     });
 
     if (!logResult.success) {
       console.error(`Failed to log callback for [${order_id}]`);
-      // Don't fail response - payment succeeded even if logging fails
     }
 
-    console.log(`Callback processed for [${order_id}], redirecting to status page...`);
+    // Clean up pending order entry
+    pendingOrders.delete(order_id);
 
-    // Redirect to frontend payment status page with order ID
-    // Frontend will query backend for final status
-    return res.redirect(
-      `${getFrontendBaseUrl(req)}/payment-status?order_id=${encodeURIComponent(order_id)}`
-    );
+    // #4 — Redirect only to our own frontend
+    const frontendBase = getFrontendBaseUrl(req);
+    const redirectUrl = `${frontendBase}/payment-status?order_id=${encodeURIComponent(order_id)}`;
+
+    if (!isAllowedRedirectUrl(redirectUrl)) {
+      console.error(`Blocked unsafe redirect to: ${redirectUrl}`);
+      return res.status(400).send("Invalid redirect destination");
+    }
+
+    return res.redirect(redirectUrl);
   } catch (error) {
     console.error("Error processing payment callback:", error.message);
-    
-    // Redirect to error page
     return res.redirect(
-      `${getFrontendBaseUrl(req)}/payment-status?error=callback_error&message=${encodeURIComponent(
-        error.message
-      )}`
+      `${getFrontendBaseUrl(req)}/payment-status?error=callback_error&message=${encodeURIComponent(error.message)}`
     );
   }
 };
 
-/**
- * Get transaction logs by order ID
- */
 const getTransactionLog = async (req, res) => {
   const { orderId } = req.params;
 
   try {
     if (!orderId) {
-      return res.status(400).json({
-        success: false,
-        message: "Order ID is required",
-      });
+      return res.status(400).json({ success: false, message: "Order ID is required" });
     }
 
     const result = await getTransaction(orderId);
 
     if (!result.success) {
-      return res.status(404).json({
-        success: false,
-        message: result.message || "Transaction not found",
-      });
+      return res.status(404).json({ success: false, message: result.message || "Transaction not found" });
     }
 
-    return res.json({
-      success: true,
-      data: result.data,
-    });
+    return res.json({ success: true, data: result.data });
   } catch (error) {
     console.error("Error fetching transaction log:", error.message);
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
-module.exports = { createHdfcSession, getOrderStatus, getTransactionLog, hdfcPaymentCallback };
-
+module.exports = { initPaymentOrder, createHdfcSession, getOrderStatus, getTransactionLog, hdfcPaymentCallback };
