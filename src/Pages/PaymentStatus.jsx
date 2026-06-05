@@ -3,28 +3,79 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 
 const downloadReceipt = (orderDetails) => {
   const date = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
-  const content = [
-    "========================================",
-    "         PRABHAVA IIMH PAYMENT RECEIPT  ",
-    "========================================",
-    `Date/Time   : ${date}`,
-    `Order ID    : ${orderDetails.orderId}`,
-    `Amount      : ₹${orderDetails.amount}`,
-    `Status      : ${orderDetails.status}`,
-    `Transaction : ${orderDetails.responseHash || "N/A"}`,
-    "----------------------------------------",
-    "Thank you for your payment.",
-    "This is a computer-generated receipt.",
-    "========================================",
-  ].join("\n");
 
-  const blob = new Blob([content], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `receipt_${orderDetails.orderId}.txt`;
-  a.click();
-  URL.revokeObjectURL(url);
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8"/>
+      <title>Payment Receipt</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6ff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .receipt { background: #fff; width: 420px; border-radius: 16px; padding: 36px 32px; box-shadow: 0 4px 24px rgba(26,63,170,0.10); }
+        .header { text-align: center; margin-bottom: 24px; }
+        .logo { font-size: 22px; font-weight: 800; color: #1a3faa; letter-spacing: -0.5px; }
+        .subtitle { font-size: 13px; color: #7b8ab8; margin-top: 4px; }
+        .badge { display: inline-block; background: #e8f5e9; color: #22c55e; font-size: 13px; font-weight: 700; padding: 4px 16px; border-radius: 20px; margin-top: 12px; }
+        .divider { height: 1px; background: #e8ecf8; margin: 20px 0; }
+        .row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; }
+        .label { font-size: 12px; color: #9ba8c5; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+        .value { font-size: 13px; color: #0f1c3f; font-weight: 600; text-align: right; max-width: 60%; word-break: break-all; }
+        .amount-value { font-size: 20px; font-weight: 800; color: #1a3faa; }
+        .footer { text-align: center; margin-top: 24px; font-size: 11px; color: #b0b9d4; line-height: 1.6; }
+        @media print {
+          body { background: #fff; }
+          .receipt { box-shadow: none; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="receipt">
+        <div class="header">
+          <div class="logo">PRABHAVA IIMH</div>
+          <div class="subtitle">Payment Receipt</div>
+          <div class="badge">✓ Payment Successful</div>
+        </div>
+        <div class="divider"></div>
+        <div class="row">
+          <span class="label">Date &amp; Time</span>
+          <span class="value">${date}</span>
+        </div>
+        <div class="row">
+          <span class="label">Order ID</span>
+          <span class="value">${orderDetails.orderId}</span>
+        </div>
+        <div class="row">
+          <span class="label">Amount Paid</span>
+          <span class="value amount-value">₹${orderDetails.amount}</span>
+        </div>
+        <div class="row">
+          <span class="label">Status</span>
+          <span class="value" style="color:#22c55e">${orderDetails.status}</span>
+        </div>
+        <div class="row">
+          <span class="label">Transaction ID</span>
+          <span class="value">${orderDetails.responseHash || "N/A"}</span>
+        </div>
+        <div class="divider"></div>
+        <div class="footer">
+          Thank you for your payment.<br/>
+          This is a computer-generated receipt and does not require a signature.<br/>
+          © Prabhava Institute of Inclusive Mental Health
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const printWindow = window.open("", "_blank", "width=500,height=700");
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.onload = () => {
+    printWindow.print();
+    printWindow.close();
+  };
 };
 
 const PaymentStatus = () => {
@@ -50,26 +101,20 @@ const PaymentStatus = () => {
           return;
         }
 
+        // Mock fallback mode
         const mockMode = searchParams.get("mock");
-
         if (mockMode === "success") {
-          const orderId =
-            searchParams.get("order_id") || sessionStorage.getItem("pendingOrderId");
+          const orderId = searchParams.get("order_id") || sessionStorage.getItem("pendingOrderId");
           const amount = searchParams.get("amount") || sessionStorage.getItem("pendingAmount") || "N/A";
-
-          setOrderDetails({
-            orderId,
-            amount,
-            status: "Success",
-            responseHash: "MOCK-TRANSACTION",
-          });
+          setOrderDetails({ orderId, amount, status: "Success", responseHash: "MOCK-TRANSACTION" });
           setStatus("success");
           return;
         }
 
-        // Get order ID from URL params or sessionStorage
-        const orderId =
-          searchParams.get("order_id") || sessionStorage.getItem("pendingOrderId");
+        const orderId = searchParams.get("order_id") || sessionStorage.getItem("pendingOrderId");
+        const hdfcStatus = searchParams.get("status");
+        const hdfcAmount = searchParams.get("amount");
+        const hdfcHash = searchParams.get("transaction_id") || searchParams.get("hash");
 
         if (!orderId) {
           setStatus("error");
@@ -77,9 +122,24 @@ const PaymentStatus = () => {
           return;
         }
 
-        console.log("🔍 Checking payment status for:", orderId);
+        // If backend redirected with status in query params, use them directly
+        if (hdfcStatus) {
+          const isSuccess = ["success", "paid", "captured", "charged"].includes(hdfcStatus.toLowerCase());
+          const pendingAmount = hdfcAmount || sessionStorage.getItem("pendingAmount") || "N/A";
 
-        // Query the backend to get transaction status
+          setOrderDetails({
+            orderId,
+            amount: pendingAmount,
+            status: isSuccess ? "Success" : "Failed",
+            responseHash: hdfcHash || null,
+          });
+          setStatus(isSuccess ? "success" : "failed");
+          if (!isSuccess) setError("Payment was not completed successfully.");
+          return;
+        }
+
+        // Fallback: query backend transaction log (requires Firebase)
+        console.log("Checking payment status for:", orderId);
         const res = await fetch(`/api/v1/hdfc/transaction-log/${orderId}`);
         const data = await res.json();
 
@@ -92,7 +152,6 @@ const PaymentStatus = () => {
         const transactionData = data.data;
         setOrderDetails(transactionData);
 
-        // Determine status based on backend log
         if (transactionData.status === "Success") {
           setStatus("success");
         } else if (transactionData.status === "Failed") {
@@ -102,7 +161,7 @@ const PaymentStatus = () => {
           setStatus("pending");
         }
       } catch (err) {
-        console.error(" Error checking status:", err);
+        console.error("Error checking status:", err);
         setStatus("error");
         setError(err.message || "Unable to check payment status");
       }

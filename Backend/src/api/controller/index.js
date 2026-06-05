@@ -176,7 +176,8 @@ const createHdfcSession = async (req, res) => {
       console.warn(`Warning: Failed to log initial transaction for [${orderId}], but continuing...`);
     }
 
-    const returnUrl = `${req.protocol}://${req.get("host")}/api/v1/hdfc/payment-callback`;
+    // HDFC POSTs to return_url after payment — must be the backend, which then redirects browser to frontend.
+    const returnUrl = `${req.protocol}://${req.hostname}:3001/api/v1/hdfc/payment-callback`;
 
     const payload = {
       order_id: orderId,
@@ -199,6 +200,7 @@ const createHdfcSession = async (req, res) => {
     console.log("  Merchant ID:", process.env.HDFC_MERCHANT_ID);
     console.log("  Customer ID:", process.env.HDFC_CUSTOMER_ID);
     console.log("  Auth Header Set:", !!process.env.HDFC_AUTH_HEADER);
+    console.log("  Return URL:", returnUrl);
 
     const response = await axios.post(
       `${process.env.HDFC_BASE_URL}/session`,
@@ -365,7 +367,11 @@ const hdfcPaymentCallback = async (req, res) => {
     const hdfcResponse = { ...req.query, ...req.body };
     const { order_id, status, amount, hash } = hdfcResponse;
 
-    console.log(`📨 Payment callback received for [${order_id}] - Status: ${status}`);
+    console.log("📨 Payment callback received");
+    console.log("  Method:", req.method);
+    console.log("  Query params:", JSON.stringify(req.query));
+    console.log("  Body:", JSON.stringify(req.body));
+    console.log("  order_id:", order_id, "| status:", status);
 
     if (!order_id || !status) {
       console.warn("Incomplete callback data:", hdfcResponse);
@@ -394,14 +400,19 @@ const hdfcPaymentCallback = async (req, res) => {
       );
     }
 
-    const isSuccess = ["success", "paid", "captured"].includes(status.toLowerCase());
+    // HDFC uses "CHARGED" for successful payments (also accept other variants)
+    const isSuccess = ["success", "paid", "captured", "charged"].includes(status.toLowerCase());
     const logStatus = isSuccess ? "Success" : "Failed";
+
+    // HDFC sends signature instead of hash in some flows
+    const transactionRef = hash || hdfcResponse.signature || null;
+    const paidAmount = amount || hdfcResponse.amount || "";
 
     const logResult = await logTransaction({
       orderId: order_id,
-      amount: amount || 0,
+      amount: paidAmount || 0,
       status: logStatus,
-      responseHash: hash || null,
+      responseHash: transactionRef,
       additionalData: {
         hdfcStatus: status,
         source: "payment-callback",
@@ -418,15 +429,22 @@ const hdfcPaymentCallback = async (req, res) => {
     // Clean up pending order entry
     pendingOrders.delete(order_id);
 
-    // #4 — Redirect only to our own frontend
+    // #4 — Redirect browser to frontend with all payment params in query string
     const frontendBase = getFrontendBaseUrl(req);
-    const redirectUrl = `${frontendBase}/payment-status?order_id=${encodeURIComponent(order_id)}`;
+    const params = new URLSearchParams({
+      order_id: order_id,
+      status: logStatus,
+      amount: String(paidAmount),
+      hash: transactionRef || "",
+    });
+    const redirectUrl = `${frontendBase}/payment-status?${params.toString()}`;
 
     if (!isAllowedRedirectUrl(redirectUrl)) {
       console.error(`Blocked unsafe redirect to: ${redirectUrl}`);
       return res.status(400).send("Invalid redirect destination");
     }
 
+    console.log(`Redirecting to frontend: ${redirectUrl}`);
     return res.redirect(redirectUrl);
   } catch (error) {
     console.error("Error processing payment callback:", error.message);

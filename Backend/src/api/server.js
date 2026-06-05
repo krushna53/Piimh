@@ -19,6 +19,8 @@ const app = express();
 const port = 3001;
 app.use(cors());
 app.use(express.json());
+// HDFC sends callback as application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1", routes);
 // const { sequelize } = db;
