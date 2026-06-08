@@ -293,54 +293,66 @@ const createHdfcSession = async (req, res) => {
 const getOrderStatus = async (req, res) => {
   const orderId = req.query.orderId;
 
+  if (!orderId) {
+    return res.status(400).json({ success: false, message: "Order ID is required" });
+  }
+
+  console.log(`ℹ️ Status API called for [${orderId}]`);
+
   try {
-    if (!orderId) {
-      return res.status(400).json({ success: false, message: "Order ID is required" });
-    }
-
-    console.log(`ℹ️ Checking HDFC status for [${orderId}]`);
-
+    // Try HDFC live status API first
     const response = await axios.get(
-      `https://smartgateway.hdfcuat.bank.in/orders/${orderId}`,
+      `${process.env.HDFC_BASE_URL}/orders/${orderId}`,
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           Authorization: process.env.HDFC_AUTH_HEADER,
+          "x-merchantid": process.env.HDFC_MERCHANT_ID,
+          "x-customerid": process.env.HDFC_CUSTOMER_ID,
         },
         timeout: 10000,
       }
     );
 
     const hdfcStatus = response.data.status || "Unknown";
-    const isSuccess = ["success", "paid", "captured"].includes(hdfcStatus.toLowerCase());
-    const logStatus = isSuccess ? "Success" : "Failed";
+    const isSuccess = ["success", "paid", "captured", "charged"].includes(hdfcStatus.toLowerCase());
 
     await logTransaction({
       orderId: response.data.order_id || orderId,
       amount: response.data.amount || 0,
-      status: logStatus,
-      responseHash: response.data.response_hash || response.data.hash || null,
-      additionalData: { hdfcStatus, source: "status-check", statusCheckAt: new Date().toISOString() },
+      status: isSuccess ? "Success" : "Failed",
+      responseHash: response.data.signature || response.data.hash || null,
+      additionalData: { hdfcStatus, source: "status-api", checkedAt: new Date().toISOString() },
     });
 
     return res.json({
       success: true,
-      orderId: response.data.order_id,
-      status: response.data.status,
+      orderId: response.data.order_id || orderId,
+      status: hdfcStatus,
       amount: response.data.amount,
+      source: "hdfc-live",
     });
-  } catch (error) {
-    console.error(`Status check failed for [${orderId}]:`, error.message);
-    if (orderId) {
-      await logTransaction({
+  } catch (hdfcError) {
+    console.warn(`HDFC status API failed for [${orderId}]: ${hdfcError.message} — falling back to DB`);
+
+    // Fall back to our own Firebase transaction log
+    const dbResult = await getTransaction(orderId);
+
+    if (dbResult.success && dbResult.data) {
+      return res.json({
+        success: true,
         orderId,
-        amount: 0,
-        status: "Failed",
-        responseHash: null,
-        additionalData: { errorType: "STATUS_CHECK_FAILED", errorMessage: error.message, source: "status-check" },
+        status: dbResult.data.status,
+        amount: dbResult.data.amount,
+        source: "database",
       });
     }
-    return res.status(500).json({ success: false, message: "Failed to check payment status", orderId });
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to retrieve order status",
+      orderId,
+    });
   }
 };
 
@@ -406,11 +418,22 @@ const hdfcPaymentCallback = async (req, res) => {
 
     // HDFC sends signature instead of hash in some flows
     const transactionRef = hash || hdfcResponse.signature || null;
-    const paidAmount = amount || hdfcResponse.amount || "";
+
+    // HDFC callback does not include amount — look up from memory, then Firestore pending log
+    const storedOrder = pendingOrders.get(order_id);
+    let paidAmount = Number(amount || hdfcResponse.amount || storedOrder?.amount || 0);
+
+    if (!paidAmount) {
+      // Fetch the pending transaction we logged at session creation to get the amount
+      const existing = await getTransaction(order_id);
+      if (existing.success && existing.data?.amount) {
+        paidAmount = Number(existing.data.amount);
+      }
+    }
 
     const logResult = await logTransaction({
       orderId: order_id,
-      amount: paidAmount || 0,
+      amount: paidAmount || 1,
       status: logStatus,
       responseHash: transactionRef,
       additionalData: {

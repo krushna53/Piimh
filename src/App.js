@@ -11,6 +11,7 @@ import '../src/dist/aos.css'
 import Program from "./Pages/Program";
 import HdfcPaymentForm from "./Pages/HdfcPayment";
 import PaymentStatus from "./Pages/PaymentStatus";
+import OrderStatusCheck from "./Pages/OrderStatusCheck";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route exact path='/contact' element={<Contact />} />
         <Route exact path='/payment' element={<HdfcPaymentForm />} />
         <Route exact path='/payment-status' element={<PaymentStatus />} />
+        <Route exact path='/order-status' element={<OrderStatusCheck />} />
       </Routes>
       <StayConnected/>
       <Footer />
