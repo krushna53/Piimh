@@ -84,21 +84,21 @@ const PaymentStatus = () => {
   const [status, setStatus] = useState("checking");
   const [orderDetails, setOrderDetails] = useState(null);
   const [error, setError] = useState(null);
-  const [statusApiResult, setStatusApiResult] = useState(null);
-  const [statusApiLoading, setStatusApiLoading] = useState(false);
-
-  const callStatusApi = async (orderId) => {
-    setStatusApiLoading(true);
-    try {
-      const res = await fetch(`/api/v1/hdfc/order-status?orderId=${encodeURIComponent(orderId)}`);
-      const data = await res.json();
-      setStatusApiResult(data);
-    } catch (err) {
-      setStatusApiResult({ success: false, message: err.message });
-    } finally {
-      setStatusApiLoading(false);
-    }
-  };
+  // Status API state — uncomment when "Verify via Status API" button is re-enabled
+  // const [statusApiResult, setStatusApiResult] = useState(null);
+  // const [statusApiLoading, setStatusApiLoading] = useState(false);
+  // const callStatusApi = async (orderId) => {
+  //   setStatusApiLoading(true);
+  //   try {
+  //     const res = await fetch(`/api/v1/hdfc/order-status?orderId=${encodeURIComponent(orderId)}`);
+  //     const data = await res.json();
+  //     setStatusApiResult(data);
+  //   } catch (err) {
+  //     setStatusApiResult({ success: false, message: err.message });
+  //   } finally {
+  //     setStatusApiLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
     const checkPaymentStatus = async () => {
@@ -261,6 +261,7 @@ const PaymentStatus = () => {
             </div>
           )}
 
+          {/* Status API verification button — uncomment to show
           <button
             style={styles.statusApiBtn(statusApiLoading)}
             onClick={() => callStatusApi(orderDetails.orderId)}
@@ -296,6 +297,7 @@ const PaymentStatus = () => {
               </div>
             </div>
           )}
+          */}
 
           <button style={styles.downloadBtn} onClick={() => downloadReceipt(orderDetails)}>
             Download Receipt
