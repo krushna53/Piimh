@@ -3,6 +3,32 @@ command = "CI='' npm run build"
 publish = "/build"
 base = "/"
 
+[functions]
+directory = "netlify/functions"
+
+# Secrets Scanning Configuration - Omit paths and keys that are not sensitive
+[build.environment]
+# Omit Backend code from secrets scanning (server-side only)
+SECRETS_SCAN_OMIT_PATHS = "Backend/**,node_modules/**"
+# These are not actual secrets - they're project IDs and types
+SECRETS_SCAN_OMIT_KEYS = "FIREBASE_TYPE,FIREBASE_UNIVERSE_DOMAIN,FIREBASE_PROJECT_ID"
+
+[dev]
+port = 8888
+targetPort = 3000
+
+[[redirects]]
+from = "/api/v1/hdfc/create-session"
+to = "/.netlify/functions/hdfc-create-session"
+status = 200
+force = true
+
+[[redirects]]
+from = "/api/v1/hdfc/transaction-log/*"
+to = "/.netlify/functions/hdfc-transaction-log"
+status = 200
+force = true
+
 [[redirects]]
 from = "/*"
 to = "/index.html"
