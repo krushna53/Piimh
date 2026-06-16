@@ -24,6 +24,12 @@ status = 200
 force = true
 
 [[redirects]]
+from = "/api/v1/hdfc/init-order"
+to = "/.netlify/functions/hdfc-init-order"
+status = 200
+force = true
+
+[[redirects]]
 from = "/api/v1/hdfc/transaction-log/*"
 to = "/.netlify/functions/hdfc-transaction-log"
 status = 200
