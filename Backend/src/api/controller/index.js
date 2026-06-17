@@ -104,7 +104,7 @@ const initPaymentOrder = (req, res) => {
     return res.status(400).json({ success: false, message: "Invalid amount" });
   }
 
-  if (!/^[a-zA-Z0-9_-]{20,}$/.test(String(orderId))) {
+  if (!/^[a-zA-Z0-9_-]{3,20}$/.test(String(orderId))) {
     return res.status(400).json({ success: false, message: "Invalid order ID format" });
   }
 
@@ -316,21 +316,76 @@ const getOrderStatus = async (req, res) => {
 
     const hdfcStatus = response.data.status || "Unknown";
     const isSuccess = ["success", "paid", "captured", "charged"].includes(hdfcStatus.toLowerCase());
+    const isPending = ["new", "pending", "pending_vbv", "authorizing"].includes(hdfcStatus.toLowerCase());
+    const logStatus = isSuccess ? "Success" : isPending ? "Pending" : "Failed";
+
+    const d = response.data;
 
     await logTransaction({
-      orderId: response.data.order_id || orderId,
-      amount: response.data.amount || 0,
-      status: isSuccess ? "Success" : "Failed",
-      responseHash: response.data.signature || response.data.hash || null,
-      additionalData: { hdfcStatus, source: "status-api", checkedAt: new Date().toISOString() },
+      orderId: d.order_id || orderId,
+      amount: d.amount || 0,
+      status: logStatus,
+      responseHash: d.signature || d.hash || null,
+      additionalData: {
+        source: "status-api",
+        checkedAt: new Date().toISOString(),
+        hdfcStatus,
+        // Core order fields
+        hdfc_id: d.id || null,
+        hdfc_txn_id: d.txn_id || null,
+        hdfc_merchant_id: d.merchant_id || null,
+        hdfc_currency: d.currency || null,
+        hdfc_date_created: d.date_created || null,
+        hdfc_return_url: d.return_url || null,
+        hdfc_product_id: d.product_id || null,
+        hdfc_payment_method_type: d.payment_method_type || null,
+        hdfc_payment_method: d.payment_method || null,
+        hdfc_auth_type: d.auth_type || null,
+        hdfc_gateway_id: d.gateway_id || null,
+        hdfc_gateway_reference_id: d.gateway_reference_id || null,
+        hdfc_resp_code: d.resp_code || null,
+        hdfc_resp_message: d.resp_message || null,
+        hdfc_bank_error_code: d.bank_error_code || null,
+        hdfc_bank_error_message: d.bank_error_message || null,
+        hdfc_txn_uuid: d.txn_uuid || null,
+        hdfc_effective_amount: d.effective_amount || null,
+        hdfc_refunded: d.refunded || false,
+        hdfc_amount_refunded: d.amount_refunded || null,
+        // Customer info
+        hdfc_customer_email: d.customer_email || null,
+        hdfc_customer_phone: d.customer_phone || null,
+        hdfc_customer_id: d.customer_id || null,
+        // Card details
+        hdfc_card: d.card || null,
+        // Payment links
+        hdfc_payment_links: d.payment_links || null,
+        // Transaction detail
+        hdfc_txn_detail: d.txn_detail || null,
+        // Payment gateway response
+        hdfc_payment_gateway_response: d.payment_gateway_response || null,
+        // Refunds
+        hdfc_refunds: d.refunds || null,
+        // UDFs
+        hdfc_udf1: d.udf1 || null,
+        hdfc_udf2: d.udf2 || null,
+        hdfc_udf3: d.udf3 || null,
+        hdfc_udf4: d.udf4 || null,
+        hdfc_udf5: d.udf5 || null,
+        // Metadata
+        hdfc_metadata: d.metadata || null,
+        hdfc_offers: d.offers || null,
+        // Full raw response
+        hdfc_full_response: d,
+      },
     });
 
     return res.json({
       success: true,
-      orderId: response.data.order_id || orderId,
+      orderId: d.order_id || orderId,
       status: hdfcStatus,
-      amount: response.data.amount,
+      amount: d.amount,
       source: "hdfc-live",
+      data: d,
     });
   } catch (hdfcError) {
     console.warn(`HDFC status API failed for [${orderId}]: ${hdfcError.message} — falling back to DB`);
