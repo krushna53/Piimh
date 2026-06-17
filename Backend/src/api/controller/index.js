@@ -431,6 +431,31 @@ const hdfcPaymentCallback = async (req, res) => {
       }
     }
 
+    // Fetch full order details from HDFC Status API
+    let hdfcOrderData = {};
+    try {
+      const statusResponse = await axios.get(
+        `${process.env.HDFC_BASE_URL}/orders/${order_id}`,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: process.env.HDFC_AUTH_HEADER,
+            "x-merchantid": process.env.HDFC_MERCHANT_ID,
+            "x-customerid": process.env.HDFC_CUSTOMER_ID,
+          },
+          timeout: 10000,
+        }
+      );
+      hdfcOrderData = statusResponse.data || {};
+      // Use amount from Status API if we don't have it
+      if (!paidAmount && hdfcOrderData.amount) {
+        paidAmount = Number(hdfcOrderData.amount);
+      }
+      console.log(`✓ HDFC Status API fetched for [${order_id}]`);
+    } catch (statusErr) {
+      console.warn(`⚠ HDFC Status API failed for [${order_id}]: ${statusErr.message}`);
+    }
+
     const logResult = await logTransaction({
       orderId: order_id,
       amount: paidAmount || 1,
@@ -440,8 +465,24 @@ const hdfcPaymentCallback = async (req, res) => {
         hdfcStatus: status,
         source: "payment-callback",
         callbackAt: new Date().toISOString(),
-        fullResponse: hdfcResponse,
+        callbackResponse: hdfcResponse,
         hashVerified: hashValid,
+        // Full HDFC order details from Status API
+        hdfc_id: hdfcOrderData.id || null,
+        hdfc_txn_id: hdfcOrderData.txn_id || null,
+        hdfc_merchant_id: hdfcOrderData.merchant_id || null,
+        hdfc_currency: hdfcOrderData.currency || "INR",
+        hdfc_date_created: hdfcOrderData.date_created || null,
+        hdfc_payment_method_type: hdfcOrderData.payment_method_type || null,
+        hdfc_auth_type: hdfcOrderData.auth_type || null,
+        hdfc_customer_email: hdfcOrderData.customer_email || null,
+        hdfc_customer_phone: hdfcOrderData.customer_phone || null,
+        hdfc_customer_id: hdfcOrderData.customer_id || null,
+        hdfc_card: hdfcOrderData.card || null,
+        hdfc_udf1: hdfcOrderData.udf1 || null,
+        hdfc_udf2: hdfcOrderData.udf2 || null,
+        hdfc_payment_links: hdfcOrderData.payment_links || null,
+        hdfc_full_response: hdfcOrderData,
       },
     });
 
