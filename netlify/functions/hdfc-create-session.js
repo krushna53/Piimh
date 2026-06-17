@@ -1,4 +1,38 @@
 const axios = require("axios");
+const admin = require("firebase-admin");
+
+if (!admin.apps.length) {
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        type: "service_account",
+        project_id: process.env.FIREBASE_PROJECT_ID,
+        private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+        private_key: (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n"),
+        client_email: process.env.FIREBASE_CLIENT_EMAIL,
+        client_id: process.env.FIREBASE_CLIENT_ID,
+      }),
+    });
+  } catch (err) {
+    console.error("Firebase init failed:", err.message);
+  }
+}
+
+const saveAmountToFirebase = async (orderId, amount) => {
+  try {
+    if (!admin.apps.length) return;
+    const db = admin.firestore();
+    await db.collection("transactions").doc(String(orderId)).set({
+      orderId: String(orderId),
+      amount: Number(amount),
+      status: "Pending",
+      lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+    console.log(`Amount ${amount} saved to Firebase for [${orderId}]`);
+  } catch (err) {
+    console.warn("Firebase save failed:", err.message);
+  }
+};
 
 exports.handler = async (event) => {
   console.log("=== HDFC Create Session Handler Started ===");
@@ -132,6 +166,9 @@ exports.handler = async (event) => {
       first_name: firstName,
       last_name: lastName,
     };
+
+    // Save amount to Firebase before sending to HDFC — callback will look it up
+    await saveAmountToFirebase(orderId, amount);
 
     console.log("HDFC Request Payload:", JSON.stringify(payload, null, 2));
 
