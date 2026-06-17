@@ -53,7 +53,7 @@ exports.handler = async (event) => {
       };
     }
 
-    if (!/^[a-zA-Z0-9_-]{20,}$/.test(String(orderId))) {
+    if (!/^[a-zA-Z0-9]{1,20}$/.test(String(orderId))) {
       return {
         statusCode: 400,
         headers: jsonHeaders,
