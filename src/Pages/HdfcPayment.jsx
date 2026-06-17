@@ -57,7 +57,7 @@ const HdfcPaymentForm = () => {
     customerEmail: "",
     customerPhone: "",
     // orderId is generated fresh each attempt to prevent duplicate submissions
-    orderId: "ORD" + uuidv4().replace(/-/g, "").slice(0, 17),
+    orderId: uuidv4().replace(/-/g, "").slice(0, 20),
     firstName: "",
     lastName: "",
   });
@@ -93,7 +93,7 @@ const HdfcPaymentForm = () => {
       if (!initRes.ok || !initData.success) {
         // #5 — If duplicate orderId, generate a new one and ask user to retry
         if (initRes.status === 409) {
-          setForm((prev) => ({ ...prev, orderId: "ORD" + uuidv4().replace(/-/g, "").slice(0, 17) }));
+          setForm((prev) => ({ ...prev, orderId: uuidv4().replace(/-/g, "").slice(0, 20) }));
           return alert("Duplicate order detected. Please try again.");
         }
         throw new Error(initData.message || "Failed to initialise payment order");
@@ -129,7 +129,7 @@ const HdfcPaymentForm = () => {
       console.error(err);
       alert(`Payment error: ${err.message || err}`);
       // Generate fresh orderId on any failure so next attempt is not flagged as duplicate
-      setForm((prev) => ({ ...prev, orderId: "ORD" + uuidv4().replace(/-/g, "").slice(0, 17) }));
+      setForm((prev) => ({ ...prev, orderId: uuidv4().replace(/-/g, "").slice(0, 20) }));
     } finally {
       setLoading(false);
     }

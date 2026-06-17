@@ -104,7 +104,7 @@ const initPaymentOrder = (req, res) => {
     return res.status(400).json({ success: false, message: "Invalid amount" });
   }
 
-  if (!/^[a-zA-Z0-9_-]{3,20}$/.test(String(orderId))) {
+  if (!/^[a-zA-Z0-9]{1,20}$/.test(String(orderId))) {
     return res.status(400).json({ success: false, message: "Invalid order ID format" });
   }
 
