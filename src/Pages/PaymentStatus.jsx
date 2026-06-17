@@ -139,8 +139,16 @@ const PaymentStatus = () => {
 
         // Always call the Status API so it is visible in the Network tab
         // This satisfies HDFC compliance requirement #3 — Status API implementation
-        const statusRes = await fetch(`/api/v1/hdfc/order-status?orderId=${encodeURIComponent(orderId)}`);
-        const statusData = await statusRes.json();
+        let statusData = { success: false };
+        try {
+          const statusRes = await fetch(`/api/v1/hdfc/order-status?orderId=${encodeURIComponent(orderId)}`);
+          const contentType = statusRes.headers.get("content-type") || "";
+          if (contentType.includes("application/json")) {
+            statusData = await statusRes.json();
+          }
+        } catch (e) {
+          console.warn("Status API unavailable:", e.message);
+        }
 
         // Use callback params as primary source, Status API as verification/fallback
         if (hdfcStatus) {
