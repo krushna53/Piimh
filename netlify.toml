@@ -30,6 +30,12 @@ status = 200
 force = true
 
 [[redirects]]
+from = "/api/v1/hdfc/payment-callback"
+to = "/.netlify/functions/hdfc-payment-callback"
+status = 200
+force = true
+
+[[redirects]]
 from = "/api/v1/hdfc/transaction-log/*"
 to = "/.netlify/functions/hdfc-transaction-log"
 status = 200
