@@ -127,7 +127,7 @@ exports.handler = async (event) => {
       payment_page_client_id: "hdfcmaster",
       action: "paymentPage",
       currency: "INR",
-      return_url: "https://shop.merchant.com",
+      return_url: (process.env.BACKEND_URL || "https://payments.piimh.com") + "/api/v1/hdfc/payment-callback",
       description: "Complete your payment",
       first_name: firstName,
       last_name: lastName,
