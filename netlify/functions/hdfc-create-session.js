@@ -1,4 +1,5 @@
 const axios = require("axios");
+const crypto = require("crypto");
 const admin = require("firebase-admin");
 
 if (!admin.apps.length) {
@@ -17,6 +18,39 @@ if (!admin.apps.length) {
     console.error("Firebase init failed:", err.message);
   }
 }
+
+/**
+ * Verify the HMAC the client echoes back matches what the server generated
+ * in init-order for this (orderId, amount) pair.
+ */
+const verifyAmountHash = (orderId, amount, amountHash) => {
+  const secret = process.env.PAYMENT_HMAC_SECRET || "piimh-payment-secret-change-in-prod";
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(`${orderId}:${amount}`)
+    .digest("hex");
+  // Constant-time comparison to prevent timing attacks
+  try {
+    return crypto.timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(amountHash, "hex"));
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Retrieve the authoritative amount written by init-order.
+ * Returns null if not found.
+ */
+const getInitAmountFromFirebase = async (orderId) => {
+  try {
+    if (!admin.apps.length) return null;
+    const snap = await admin.firestore().collection("transactions").doc(String(orderId)).get();
+    if (snap.exists && snap.data().amount) return Number(snap.data().amount);
+  } catch (err) {
+    console.warn("Firebase init-amount lookup failed:", err.message);
+  }
+  return null;
+};
 
 const saveAmountToFirebase = async (orderId, amount) => {
   try {
@@ -82,7 +116,8 @@ exports.handler = async (event) => {
     }
 
     const {
-      amount,
+      amount: clientAmount,
+      amountHash,
       customerId,
       customerEmail,
       customerPhone,
@@ -93,7 +128,7 @@ exports.handler = async (event) => {
 
     console.log("Request Parameters:", {
       orderId,
-      amount,
+      clientAmount,
       customerId,
       customerEmail,
       customerPhone,
@@ -101,8 +136,8 @@ exports.handler = async (event) => {
       lastName,
     });
 
-    // Validate required fields
-    const requiredFields = { orderId, amount, customerId, customerEmail, customerPhone };
+    // Validate required fields (amount still required from client so legacy flows aren't broken)
+    const requiredFields = { orderId, amount: clientAmount, customerId, customerEmail, customerPhone };
     const missingFields = Object.entries(requiredFields)
       .filter(([key, value]) => !value)
       .map(([key]) => key);
@@ -112,7 +147,7 @@ exports.handler = async (event) => {
       return {
         statusCode: 400,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           success: false,
           message: `Missing required fields: ${missingFields.join(", ")}`,
           missingFields
@@ -121,6 +156,56 @@ exports.handler = async (event) => {
     }
 
     console.log("✓ All required fields present");
+
+    // ── Amount integrity check (SG-4356) ────────────────────────────────────
+    // 1. Look up the authoritative amount stored during init-order.
+    // 2. Verify the HMAC the client echoes back.
+    // 3. Use the server-side amount for all downstream operations — never the
+    //    raw client-supplied value.
+
+    const storedAmount = await getInitAmountFromFirebase(orderId);
+
+    if (storedAmount === null) {
+      console.error(`✗ No server-side amount record found for orderId [${orderId}]. Rejecting.`);
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          success: false,
+          message: "Invalid or expired order. Please restart the payment flow.",
+        }),
+      };
+    }
+
+    // Verify HMAC if the client supplied one (required for new clients)
+    if (!amountHash) {
+      console.error(`✗ Missing amountHash for orderId [${orderId}]`);
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          success: false,
+          message: "Missing amountHash. Payment integrity check failed.",
+        }),
+      };
+    }
+
+    if (!verifyAmountHash(orderId, storedAmount, amountHash)) {
+      console.error(`✗ HMAC mismatch for orderId [${orderId}]. Possible tampering. clientAmount=${clientAmount}, storedAmount=${storedAmount}`);
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          success: false,
+          message: "Payment amount integrity check failed. Please restart the payment flow.",
+        }),
+      };
+    }
+
+    // Use the server-verified amount from this point on
+    const amount = storedAmount;
+    console.log(`✓ Amount integrity verified for [${orderId}]: ${amount} (client sent: ${clientAmount})`);
+    // ── End amount integrity check ───────────────────────────────────────────
 
     // Validate environment variables
     const hdfc_base_url = process.env.HDFC_BASE_URL;
