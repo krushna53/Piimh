@@ -24,12 +24,12 @@ if (!admin.apps.length) {
  * in init-order for this (orderId, amount) pair.
  */
 const verifyAmountHash = (orderId, amount, amountHash) => {
-  const secret = process.env.PAYMENT_HMAC_SECRET || "piimh-payment-secret-change-in-prod";
+  const secret = process.env.PAYMENT_HMAC_SECRET;
+  if (!secret) throw new Error("PAYMENT_HMAC_SECRET env var is not configured");
   const expected = crypto
     .createHmac("sha256", secret)
     .update(`${orderId}:${amount}`)
     .digest("hex");
-  // Constant-time comparison to prevent timing attacks
   try {
     return crypto.timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(amountHash, "hex"));
   } catch {
@@ -96,6 +96,15 @@ exports.handler = async (event) => {
   }
 
   try {
+    if (!process.env.PAYMENT_HMAC_SECRET) {
+      console.error("PAYMENT_HMAC_SECRET is not set");
+      return {
+        statusCode: 500,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ success: false, message: "Server configuration error" }),
+      };
+    }
+
     console.log("Raw event body:", event.body);
     
     let parsedBody;

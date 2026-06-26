@@ -19,7 +19,8 @@ if (!admin.apps.length) {
 }
 
 const generateAmountHash = (orderId, amount) => {
-  const secret = process.env.PAYMENT_HMAC_SECRET || "piimh-payment-secret-change-in-prod";
+  const secret = process.env.PAYMENT_HMAC_SECRET;
+  if (!secret) throw new Error("PAYMENT_HMAC_SECRET env var is not configured");
   return crypto
     .createHmac("sha256", secret)
     .update(`${orderId}:${amount}`)
@@ -80,6 +81,15 @@ exports.handler = async (event) => {
   }
 
   try {
+    if (!process.env.PAYMENT_HMAC_SECRET) {
+      console.error("PAYMENT_HMAC_SECRET is not set");
+      return {
+        statusCode: 500,
+        headers: jsonHeaders,
+        body: JSON.stringify({ success: false, message: "Server configuration error" }),
+      };
+    }
+
     const body = event.body ? JSON.parse(event.body) : {};
     const { orderId, amount } = body;
     const parsedAmount = Number(amount);
