@@ -1,11 +1,54 @@
 const crypto = require("crypto");
+const admin = require("firebase-admin");
+
+if (!admin.apps.length) {
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        type: "service_account",
+        project_id: process.env.FIREBASE_PROJECT_ID,
+        private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+        private_key: (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n"),
+        client_email: process.env.FIREBASE_CLIENT_EMAIL,
+        client_id: process.env.FIREBASE_CLIENT_ID,
+      }),
+    });
+  } catch (err) {
+    console.error("Firebase init failed:", err.message);
+  }
+}
 
 const generateAmountHash = (orderId, amount) => {
-  const secret = process.env.PAYMENT_HMAC_SECRET || "piimh-payment-secret-change-in-prod";
+  const secret = process.env.PAYMENT_HMAC_SECRET;
+  if (!secret) throw new Error("PAYMENT_HMAC_SECRET env var is not configured");
   return crypto
     .createHmac("sha256", secret)
     .update(`${orderId}:${amount}`)
     .digest("hex");
+};
+
+/**
+ * Persist the authoritative amount to Firestore so create-session can
+ * retrieve it server-side instead of trusting the client-supplied value.
+ */
+const saveInitAmountToFirebase = async (orderId, amount) => {
+  try {
+    if (!admin.apps.length) return;
+    const db = admin.firestore();
+    await db.collection("transactions").doc(String(orderId)).set(
+      {
+        orderId: String(orderId),
+        amount: Number(amount),
+        status: "Initiated",
+        lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+    console.log(`Init amount ${amount} saved to Firebase for [${orderId}]`);
+  } catch (err) {
+    // Non-fatal — HMAC check in create-session is the primary defence
+    console.warn("Firebase init-amount save failed:", err.message);
+  }
 };
 
 const jsonHeaders = {
@@ -38,6 +81,15 @@ exports.handler = async (event) => {
   }
 
   try {
+    if (!process.env.PAYMENT_HMAC_SECRET) {
+      console.error("PAYMENT_HMAC_SECRET is not set");
+      return {
+        statusCode: 500,
+        headers: jsonHeaders,
+        body: JSON.stringify({ success: false, message: "Server configuration error" }),
+      };
+    }
+
     const body = event.body ? JSON.parse(event.body) : {};
     const { orderId, amount } = body;
     const parsedAmount = Number(amount);
@@ -76,6 +128,9 @@ exports.handler = async (event) => {
     }
 
     const amountHash = generateAmountHash(orderId, parsedAmount);
+
+    // Persist authoritative amount server-side before returning to client
+    await saveInitAmountToFirebase(orderId, parsedAmount);
 
     return {
       statusCode: 200,

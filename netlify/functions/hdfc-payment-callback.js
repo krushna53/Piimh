@@ -35,7 +35,7 @@ const saveToFirebase = async (orderId, amount, status, transactionRef, hdfcData)
     const d = hdfcData || {};
     const doc = {
       orderId: String(orderId),
-      amount: Number(amount) || 1,
+      amount: Number(amount) || null,
       status,
       responseHash: transactionRef || null,
       lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
@@ -154,12 +154,14 @@ exports.handler = async (event) => {
   const logStatus = isSuccess ? "Success" : "Failed";
   const transactionRef = hash || signature || null;
 
-  // Amount from callback, fallback to Firebase
+  // Retrieve authoritative amount written during init-order / create-session
+  const storedAmount = await getAmountFromFirebase(order_id);
+
+  // Amount from callback, fallback to stored amount
   let paidAmount = Number(amount || 0);
-  if (!paidAmount) {
-    const fbAmount = await getAmountFromFirebase(order_id);
-    if (fbAmount) paidAmount = fbAmount;
-    console.log(`Amount from Firebase for [${order_id}]:`, fbAmount);
+  if (!paidAmount && storedAmount) {
+    paidAmount = storedAmount;
+    console.log(`Amount from Firebase for [${order_id}]:`, storedAmount);
   }
 
   // Fetch full order data from HDFC Status API
@@ -183,6 +185,40 @@ exports.handler = async (event) => {
   } catch (err) {
     console.warn(`HDFC Status API failed for [${order_id}]: ${err.message}`);
   }
+
+  // ── Paid-amount integrity check (SG-4356) ───────────────────────────────
+  // Use the HDFC-confirmed amount as the source of truth.
+  // Block success if we cannot verify the amount against our stored record.
+  const hdfcConfirmedAmount = hdfcOrderData.amount ? Number(hdfcOrderData.amount) : null;
+
+  if (isSuccess) {
+    // If Firebase has no stored amount, we cannot verify — reject to be safe
+    if (!storedAmount) {
+      console.error(
+        `✗ NO STORED AMOUNT for [${order_id}]: cannot verify paid amount. Marking as Tampered.`
+      );
+      await saveToFirebase(order_id, hdfcConfirmedAmount || paidAmount, "Tampered", transactionRef, hdfcOrderData);
+      return {
+        statusCode: 302,
+        headers: { Location: `${FRONTEND_URL}/payment-status?error=amount_mismatch&order_id=${order_id}` },
+      };
+    }
+
+    if (hdfcConfirmedAmount !== null && Math.abs(hdfcConfirmedAmount - storedAmount) > 0.01) {
+      console.error(
+        `✗ AMOUNT MISMATCH for [${order_id}]: HDFC confirmed ${hdfcConfirmedAmount}, stored ${storedAmount}. Marking as Tampered.`
+      );
+      await saveToFirebase(order_id, hdfcConfirmedAmount, "Tampered", transactionRef, hdfcOrderData);
+      return {
+        statusCode: 302,
+        headers: { Location: `${FRONTEND_URL}/payment-status?error=amount_mismatch&order_id=${order_id}` },
+      };
+    }
+  }
+
+  // Use the HDFC-confirmed amount for the final record when available
+  if (hdfcConfirmedAmount) paidAmount = hdfcConfirmedAmount;
+  // ── End paid-amount integrity check ─────────────────────────────────────
 
   // Save everything to Firebase
   await saveToFirebase(order_id, paidAmount, logStatus, transactionRef, hdfcOrderData);

@@ -6,10 +6,13 @@ const { logTransaction, getTransaction } = require("../firebase");
 // Prevents frontend from tampering with the amount between init and submit
 const pendingOrders = new Map();
 
-const HMAC_SECRET = process.env.PAYMENT_HMAC_SECRET || "piimh-payment-secret-change-in-prod";
+const HMAC_SECRET = process.env.PAYMENT_HMAC_SECRET;
+if (!HMAC_SECRET) {
+  console.error("FATAL: PAYMENT_HMAC_SECRET env var is not set. Payment integrity checks will fail.");
+}
 
-// #2 — Generate HMAC hash of orderId + amount so backend can verify it wasn't tampered
 const generateAmountHash = (orderId, amount) => {
+  if (!HMAC_SECRET) throw new Error("PAYMENT_HMAC_SECRET env var is not configured");
   return crypto
     .createHmac("sha256", HMAC_SECRET)
     .update(`${orderId}:${amount}`)
@@ -93,6 +96,10 @@ const getFrontendBaseUrl = (req) => {
 // #2 — New endpoint: frontend calls this first to register the order amount server-side
 // Returns a hash the frontend must pass with the payment request
 const initPaymentOrder = (req, res) => {
+  if (!HMAC_SECRET) {
+    return res.status(500).json({ success: false, message: "Server configuration error" });
+  }
+
   const { orderId, amount } = req.body;
 
   if (!orderId || !amount) {
@@ -243,10 +250,11 @@ const createHdfcSession = async (req, res) => {
       pendingOrders.set(orderId, { ...existing, submitting: false });
     }
 
-    if (orderId && req.body?.amount) {
+    const failedPending = orderId ? pendingOrders.get(orderId) : null;
+    if (orderId && failedPending?.amount) {
       await logTransaction({
         orderId,
-        amount: req.body.amount,
+        amount: failedPending.amount,
         status: "Failed",
         responseHash: null,
         additionalData: {
@@ -513,7 +521,7 @@ const hdfcPaymentCallback = async (req, res) => {
 
     const logResult = await logTransaction({
       orderId: order_id,
-      amount: paidAmount || 1,
+      amount: paidAmount || null,
       status: logStatus,
       responseHash: transactionRef,
       additionalData: {
