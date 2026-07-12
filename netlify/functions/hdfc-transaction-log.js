@@ -1,4 +1,6 @@
 const admin = require("firebase-admin");
+const crypto = require("crypto");
+const { sendSecurityAlert } = require("./lib/security-alert");
 
 console.log("=== HDFC Transaction Log Function Initializing ===");
 
@@ -70,6 +72,45 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
+
+// Whitelist of fields safe to return to whoever presents a valid access
+// token for this order. Everything else on the Firestore document (email,
+// phone, full HDFC response, card/UPI metadata, the accessTokenHash itself)
+// is withheld even from an authorized caller — the status page doesn't need it.
+const SAFE_RESPONSE_FIELDS = [
+  "orderId",
+  "amount",
+  "status",
+  "responseHash",
+  "hdfcStatus",
+  "callbackAt",
+  "lastUpdated",
+];
+
+const toSafeResponse = (data) => {
+  const safe = {};
+  for (const key of SAFE_RESPONSE_FIELDS) {
+    if (key in data) safe[key] = data[key];
+  }
+  return safe;
+};
+
+/**
+ * Constant-time check that the caller-supplied token matches the token
+ * issued for this order at init-order time. Fixes IDOR: previously any
+ * caller who knew/guessed an orderId (e.g. from browser history or a
+ * shared payment-status URL) could read another customer's full
+ * transaction record with no authorization check at all.
+ */
+const isAuthorized = (storedTokenHash, providedToken) => {
+  if (!storedTokenHash || !providedToken) return false;
+  try {
+    const providedHash = crypto.createHash("sha256").update(String(providedToken)).digest("hex");
+    return crypto.timingSafeEqual(Buffer.from(storedTokenHash, "hex"), Buffer.from(providedHash, "hex"));
+  } catch {
+    return false;
+  }
+};
 
 /**
  * Get transaction details by order ID
@@ -147,7 +188,7 @@ exports.handler = async (event) => {
       console.warn(`✗ Transaction not found for [${orderId}]`);
       return {
         statusCode: 404,
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
         },
@@ -158,16 +199,43 @@ exports.handler = async (event) => {
       };
     }
 
+    // ── Authorization check (fixes IDOR) ────────────────────────────────
+    const providedToken = (event.queryStringParameters && event.queryStringParameters.token) || "";
+    if (!isAuthorized(result.data.accessTokenHash, providedToken)) {
+      // Note: this can also fire for legitimate customers whose
+      // sessionStorage token was cleared (new device/browser, cleared
+      // storage) — it's not proof of an attack on its own, but a burst of
+      // these for different orderIds from the same source is a strong IDOR
+      // probing signal worth having eyes on.
+      await sendSecurityAlert("TRANSACTION_LOG_UNAUTHORIZED", {
+        order_id: orderId,
+        token_provided: providedToken ? "yes (invalid)" : "no",
+        source_ip: event.headers?.["x-nf-client-connection-ip"] || event.headers?.["client-ip"] || "unknown",
+      });
+      return {
+        statusCode: 403,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({
+          success: false,
+          message: "Not authorized to view this transaction",
+        }),
+      };
+    }
+    // ── End authorization check ─────────────────────────────────────────
+
     return {
       statusCode: 200,
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
       body: JSON.stringify({
         success: true,
         orderId: orderId,
-        data: result.data,
+        data: toSafeResponse(result.data),
       }),
     };
   } catch (error) {

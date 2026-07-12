@@ -1,5 +1,6 @@
 const admin = require("firebase-admin");
 const axios = require("axios");
+const { sendSecurityAlert } = require("./lib/security-alert");
 
 if (!admin.apps.length) {
   try {
@@ -139,33 +140,30 @@ exports.handler = async (event) => {
   }
 
   const hdfcResponse = { ...(event.queryStringParameters || {}), ...bodyParams };
-  const { order_id, status, amount, hash, signature } = hdfcResponse;
+  const { order_id, status: callbackStatus, amount: callbackAmount, hash, signature } = hdfcResponse;
 
   console.log("Parsed callback:", JSON.stringify(hdfcResponse));
 
-  if (!order_id || !status) {
+  if (!order_id) {
     return {
       statusCode: 302,
       headers: { Location: `${FRONTEND_URL}/payment-status?error=invalid_callback` },
     };
   }
 
-  const isSuccess = ["success", "paid", "captured", "charged"].includes((status || "").toLowerCase());
-  const logStatus = isSuccess ? "Success" : "Failed";
   const transactionRef = hash || signature || null;
 
   // Retrieve authoritative amount written during init-order / create-session
   const storedAmount = await getAmountFromFirebase(order_id);
 
-  // Amount from callback, fallback to stored amount
-  let paidAmount = Number(amount || 0);
-  if (!paidAmount && storedAmount) {
-    paidAmount = storedAmount;
-    console.log(`Amount from Firebase for [${order_id}]:`, storedAmount);
-  }
-
-  // Fetch full order data from HDFC Status API
-  let hdfcOrderData = {};
+  // ── Authoritative status verification (fixes callback spoofing) ─────────
+  // This endpoint is a public URL that HDFC redirects/POSTs to, but nothing
+  // verifies the request actually came from HDFC. Previously "success" was
+  // decided by the caller-supplied `status` param, so anyone could call
+  // this URL directly with status=success and have the order marked paid.
+  // We now treat HDFC's own Status API response as the only source of truth
+  // for whether the order actually succeeded.
+  let hdfcOrderData = null;
   try {
     const statusRes = await axios.get(
       `${process.env.HDFC_BASE_URL}/orders/${order_id}`,
@@ -179,24 +177,60 @@ exports.handler = async (event) => {
         timeout: 10000,
       }
     );
-    hdfcOrderData = statusRes.data || {};
-    if (!paidAmount && hdfcOrderData.amount) paidAmount = Number(hdfcOrderData.amount);
+    hdfcOrderData = statusRes.data || null;
     console.log(`HDFC Status API fetched for [${order_id}]`);
   } catch (err) {
     console.warn(`HDFC Status API failed for [${order_id}]: ${err.message}`);
   }
 
+  // Flag any mismatch between what the caller claimed and what HDFC actually
+  // reports — a strong signal of a forged/spoofed callback attempt.
+  if (callbackStatus && hdfcOrderData?.status &&
+      String(callbackStatus).toLowerCase() !== String(hdfcOrderData.status).toLowerCase()) {
+    await sendSecurityAlert("CALLBACK_SPOOF_SUSPECTED", {
+      order_id,
+      claimed_status: callbackStatus,
+      hdfc_status: hdfcOrderData.status,
+      source_ip: event.headers?.["x-nf-client-connection-ip"] || event.headers?.["client-ip"] || "unknown",
+    });
+  }
+
+  // Fail closed: if we can't independently confirm the order with HDFC,
+  // never mark it as paid.
+  if (!hdfcOrderData || !hdfcOrderData.status) {
+    await sendSecurityAlert("CALLBACK_VERIFICATION_FAILED", {
+      order_id,
+      claimed_status: callbackStatus || "(none)",
+      reason: "HDFC Status API did not return a usable status",
+    });
+    await saveToFirebase(order_id, storedAmount || 0, "VerificationFailed", transactionRef, hdfcOrderData || {});
+    return {
+      statusCode: 302,
+      headers: { Location: `${FRONTEND_URL}/payment-status?error=verification_failed&order_id=${order_id}` },
+    };
+  }
+
+  // Confirmed against real Firestore data: HDFC SmartGateway returns "CHARGED"
+  // for a successful order. Comparison below is case-insensitive, so the
+  // casing here doesn't matter, but keeping it accurate for readability.
+  const HDFC_SUCCESS_STATUSES = ["charged", "success", "captured", "paid"];
+  const isSuccess = HDFC_SUCCESS_STATUSES.includes(String(hdfcOrderData.status).toLowerCase());
+  const logStatus = isSuccess ? "Success" : "Failed";
+  // ── End authoritative status verification ────────────────────────────────
+
   // ── Paid-amount integrity check (SG-4356) ───────────────────────────────
   // Use the HDFC-confirmed amount as the source of truth.
   // Block success if we cannot verify the amount against our stored record.
   const hdfcConfirmedAmount = hdfcOrderData.amount ? Number(hdfcOrderData.amount) : null;
+  let paidAmount = hdfcConfirmedAmount ?? storedAmount ?? Number(callbackAmount || 0);
 
   if (isSuccess) {
     // If Firebase has no stored amount, we cannot verify — reject to be safe
     if (!storedAmount) {
-      console.error(
-        `✗ NO STORED AMOUNT for [${order_id}]: cannot verify paid amount. Marking as Tampered.`
-      );
+      await sendSecurityAlert("NO_STORED_AMOUNT", {
+        order_id,
+        hdfc_confirmed_amount: hdfcConfirmedAmount,
+      });
       await saveToFirebase(order_id, hdfcConfirmedAmount || paidAmount, "Tampered", transactionRef, hdfcOrderData);
       return {
         statusCode: 302,
@@ -205,9 +239,11 @@ exports.handler = async (event) => {
     }
 
     if (hdfcConfirmedAmount !== null && Math.abs(hdfcConfirmedAmount - storedAmount) > 0.01) {
-      console.error(
-        `✗ AMOUNT MISMATCH for [${order_id}]: HDFC confirmed ${hdfcConfirmedAmount}, stored ${storedAmount}. Marking as Tampered.`
-      );
+      await sendSecurityAlert("AMOUNT_MISMATCH", {
+        order_id,
+        hdfc_confirmed_amount: hdfcConfirmedAmount,
+        stored_amount: storedAmount,
+      });
       await saveToFirebase(order_id, hdfcConfirmedAmount, "Tampered", transactionRef, hdfcOrderData);
       return {
         statusCode: 302,
@@ -215,9 +251,6 @@ exports.handler = async (event) => {
       };
     }
   }
-
-  // Use the HDFC-confirmed amount for the final record when available
-  if (hdfcConfirmedAmount) paidAmount = hdfcConfirmedAmount;
   // ── End paid-amount integrity check ─────────────────────────────────────
 
   // Save everything to Firebase

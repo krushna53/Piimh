@@ -1,6 +1,7 @@
 const axios = require("axios");
 const crypto = require("crypto");
 const admin = require("firebase-admin");
+const { sendSecurityAlert } = require("./lib/security-alert");
 
 if (!admin.apps.length) {
   try {
@@ -200,7 +201,12 @@ exports.handler = async (event) => {
     }
 
     if (!verifyAmountHash(orderId, storedAmount, amountHash)) {
-      console.error(`✗ HMAC mismatch for orderId [${orderId}]. Possible tampering. clientAmount=${clientAmount}, storedAmount=${storedAmount}`);
+      await sendSecurityAlert("AMOUNT_HMAC_MISMATCH", {
+        order_id: orderId,
+        client_amount: clientAmount,
+        stored_amount: storedAmount,
+        source_ip: event.headers?.["x-nf-client-connection-ip"] || event.headers?.["client-ip"] || "unknown",
+      });
       return {
         statusCode: 400,
         headers: { "Content-Type": "application/json" },

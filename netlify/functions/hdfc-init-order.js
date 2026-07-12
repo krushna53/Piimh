@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const admin = require("firebase-admin");
+const { sendSecurityAlert } = require("./lib/security-alert");
 
 if (!admin.apps.length) {
   try {
@@ -28,10 +29,20 @@ const generateAmountHash = (orderId, amount) => {
 };
 
 /**
+ * Per-order secret used to authorize later reads of the transaction log
+ * (fixes IDOR on GET /transaction-log/:orderId — the orderId alone is no
+ * longer sufficient to read someone else's payment data). Only the SHA-256
+ * hash is ever persisted; the raw token is returned once here and must be
+ * presented by the client on subsequent transaction-log requests.
+ */
+const generateAccessToken = () => crypto.randomBytes(24).toString("hex");
+const hashAccessToken = (token) => crypto.createHash("sha256").update(token).digest("hex");
+
+/**
  * Persist the authoritative amount to Firestore so create-session can
  * retrieve it server-side instead of trusting the client-supplied value.
  */
-const saveInitAmountToFirebase = async (orderId, amount) => {
+const saveInitAmountToFirebase = async (orderId, amount, accessTokenHash) => {
   try {
     if (!admin.apps.length) return;
     const db = admin.firestore();
@@ -40,6 +51,7 @@ const saveInitAmountToFirebase = async (orderId, amount) => {
         orderId: String(orderId),
         amount: Number(amount),
         status: "Initiated",
+        accessTokenHash,
         lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
       },
       { merge: true }
@@ -54,6 +66,33 @@ const saveInitAmountToFirebase = async (orderId, amount) => {
 const jsonHeaders = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
+};
+
+// Realistic ceiling on a single payment. Overridable via env var. This is a
+// blast-radius reducer, not a substitute for a real price catalog — it just
+// stops absurd values (the old ceiling let through amounts up to ~99.9 crore).
+const MAX_PAYMENT_AMOUNT = Number(process.env.MAX_PAYMENT_AMOUNT) || 1000000; // ₹10,00,000 default
+
+/**
+ * Optional server-side allow-list of valid payment amounts (SG-4356
+ * remediation item: "enforce server-side price calculation from
+ * authoritative data"). We don't have a price catalog yet, so this is
+ * config-driven and OFF by default:
+ *   - Unset ALLOWED_PAYMENT_AMOUNTS  -> amount is free-form (donations,
+ *     user-chosen amounts); only the sanity bounds above apply.
+ *   - Set ALLOWED_PAYMENT_AMOUNTS="100,500,1000,5000" -> only those exact
+ *     values are accepted; everything else is rejected with 400.
+ * Flip this on the moment a real list/catalog exists — no code change
+ * needed, just set the env var.
+ */
+const getAllowedAmounts = () => {
+  const raw = process.env.ALLOWED_PAYMENT_AMOUNTS;
+  if (!raw) return null;
+  const parsed = raw
+    .split(",")
+    .map((v) => Number(v.trim()))
+    .filter((v) => !Number.isNaN(v) && v > 0);
+  return parsed.length ? parsed : null;
 };
 
 exports.handler = async (event) => {
@@ -116,7 +155,7 @@ exports.handler = async (event) => {
       };
     }
 
-    if (Number.isNaN(parsedAmount) || parsedAmount <= 0 || parsedAmount > 999999999) {
+    if (Number.isNaN(parsedAmount) || parsedAmount <= 0 || parsedAmount > MAX_PAYMENT_AMOUNT) {
       return {
         statusCode: 400,
         headers: jsonHeaders,
@@ -127,10 +166,38 @@ exports.handler = async (event) => {
       };
     }
 
-    const amountHash = generateAmountHash(orderId, parsedAmount);
+    // ── Price catalog check (SG-4356 remediation, deferred) ────────────────
+    const allowedAmounts = getAllowedAmounts();
+    if (allowedAmounts) {
+      if (!allowedAmounts.includes(parsedAmount)) {
+        await sendSecurityAlert("AMOUNT_NOT_IN_ALLOWLIST", {
+          order_id: orderId,
+          amount: parsedAmount,
+          source_ip: event.headers?.["x-nf-client-connection-ip"] || event.headers?.["client-ip"] || "unknown",
+        });
+        return {
+          statusCode: 400,
+          headers: jsonHeaders,
+          body: JSON.stringify({
+            success: false,
+            message: "Invalid amount",
+          }),
+        };
+      }
+    } else {
+      // No catalog configured yet. Not blocking — amount is currently
+      // free-form by design — but log it so a real allow-list can be
+      // derived from actual traffic once one is defined.
+      console.log(`ℹ No amount allow-list configured; accepting amount ${parsedAmount} for [${orderId}] unchecked`);
+    }
+    // ── End price catalog check ─────────────────────────────────────────────
 
-    // Persist authoritative amount server-side before returning to client
-    await saveInitAmountToFirebase(orderId, parsedAmount);
+    const amountHash = generateAmountHash(orderId, parsedAmount);
+    const accessToken = generateAccessToken();
+    const accessTokenHash = hashAccessToken(accessToken);
+
+    // Persist authoritative amount + access-token hash server-side before returning to client
+    await saveInitAmountToFirebase(orderId, parsedAmount, accessTokenHash);
 
     return {
       statusCode: 200,
@@ -140,6 +207,9 @@ exports.handler = async (event) => {
         orderId,
         amount: parsedAmount,
         amountHash,
+        // Client must store this (e.g. sessionStorage) and present it back
+        // on GET /transaction-log/:orderId. Never logged, never stored raw.
+        accessToken,
       }),
     };
   } catch (error) {

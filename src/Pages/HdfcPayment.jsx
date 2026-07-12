@@ -99,6 +99,14 @@ const HdfcPaymentForm = () => {
         throw new Error(initData.message || "Failed to initialise payment order");
       }
 
+      // Store the per-order access token so the status page can prove it's
+      // the same browser that initiated this payment when it later reads
+      // /transaction-log/:orderId (fixes IDOR — orderId alone is no longer
+      // enough to read someone else's transaction).
+      if (initData.accessToken) {
+        sessionStorage.setItem("orderAccessToken", initData.accessToken);
+      }
+
       // #2 — Step 2: Submit payment with the server-issued amountHash
       const requestPayload = {
         ...form,

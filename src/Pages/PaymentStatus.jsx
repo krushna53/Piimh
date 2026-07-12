@@ -187,9 +187,20 @@ const PaymentStatus = () => {
           return;
         }
 
-        // Last resort: query Firebase transaction log
-        const res = await fetch(`/api/v1/hdfc/transaction-log/${orderId}`);
+        // Last resort: query Firebase transaction log. Requires the
+        // per-order access token issued at init-order time — without it the
+        // function returns 403 (see hdfc-transaction-log.js).
+        const accessToken = sessionStorage.getItem("orderAccessToken") || "";
+        const res = await fetch(
+          `/api/v1/hdfc/transaction-log/${orderId}?token=${encodeURIComponent(accessToken)}`
+        );
         const data = await res.json();
+
+        if (res.status === 403) {
+          setStatus("error");
+          setError("Unable to verify this payment in this browser session. Please use the link from your original checkout.");
+          return;
+        }
 
         if (!res.ok || !data.success) {
           setStatus("error");
