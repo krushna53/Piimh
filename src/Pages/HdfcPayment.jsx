@@ -108,7 +108,7 @@ const HdfcPaymentForm = () => {
       }
 
       // #2 — Step 2: Submit payment with the server-issued amountHash
-    const { amount, ...formWithoutAmount } = form;
+    const { amount: _, ...formWithoutAmount } = form;
 
     const requestPayload = {
      ...formWithoutAmount,
