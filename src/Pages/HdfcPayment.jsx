@@ -111,7 +111,6 @@ const HdfcPaymentForm = () => {
       const requestPayload = {
         ...form,
         orderId,
-        amount,
         amountHash: initData.amountHash,
       };
 
