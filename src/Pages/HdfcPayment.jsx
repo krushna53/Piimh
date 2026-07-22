@@ -108,11 +108,13 @@ const HdfcPaymentForm = () => {
       }
 
       // #2 — Step 2: Submit payment with the server-issued amountHash
-      const requestPayload = {
-        ...form,
-        orderId,
-        amountHash: initData.amountHash,
-      };
+    const { amount, ...formWithoutAmount } = form;
+
+    const requestPayload = {
+     ...formWithoutAmount,
+     orderId,
+     amountHash: initData.amountHash,
+};
 
       const res = await fetch("/api/v1/hdfc/create-session", {
         method: "POST",
