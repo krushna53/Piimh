@@ -147,7 +147,7 @@ exports.handler = async (event) => {
     });
 
     // Validate required fields (amount still required from client so legacy flows aren't broken)
-    const requiredFields = { orderId, customerId, customerEmail, customerPhone };
+    const requiredFields = { orderId,amountHash, customerId, customerEmail, customerPhone };
     const missingFields = Object.entries(requiredFields)
       .filter(([key, value]) => !value)
       .map(([key]) => key);
