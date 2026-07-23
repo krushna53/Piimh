@@ -43,24 +43,34 @@ const hashAccessToken = (token) => crypto.createHash("sha256").update(token).dig
  * retrieve it server-side instead of trusting the client-supplied value.
  */
 const saveInitAmountToFirebase = async (orderId, amount, accessTokenHash) => {
-  try {
-    if (!admin.apps.length) return;
-    const db = admin.firestore();
-    await db.collection("transactions").doc(String(orderId)).set(
-      {
-        orderId: String(orderId),
-        amount: Number(amount),
-        status: "Initiated",
-        accessTokenHash,
-        lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
-      },
-      { merge: true }
-    );
-    console.log(`Init amount ${amount} saved to Firebase for [${orderId}]`);
-  } catch (err) {
-    // Non-fatal — HMAC check in create-session is the primary defence
-    console.warn("Firebase init-amount save failed:", err.message);
+  if (!admin.apps.length) {
+    throw new Error("Firebase is not initialized");
   }
+  const db = admin.firestore();
+  await db.runTransaction(async (transaction) => {
+    const docRef = db.collection("transactions").doc(String(orderId));
+    const doc = await transaction.get(docRef);
+
+    if (doc.exists) {
+      const existingAmount = Number(doc.data().amount);
+
+      if (existingAmount !== Number(amount)) {
+        throw new Error("Amount cannot be modified");
+      }
+
+      return;
+    }
+
+    transaction.set(docRef, {
+      orderId: String(orderId),
+      amount: Number(amount),
+      status: "Initiated",
+      accessTokenHash,
+      lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  });
+
+  console.log(`Init amount ${amount} saved to Firebase for [${orderId}]`);
 };
 
 const jsonHeaders = {
@@ -197,7 +207,18 @@ exports.handler = async (event) => {
     const accessTokenHash = hashAccessToken(accessToken);
 
     // Persist authoritative amount + access-token hash server-side before returning to client
-    await saveInitAmountToFirebase(orderId, parsedAmount, accessTokenHash);
+   try {
+  await saveInitAmountToFirebase(orderId, parsedAmount, accessTokenHash);
+} catch (err) {
+  return {
+    statusCode: 400,
+    headers: jsonHeaders,
+    body: JSON.stringify({
+      success: false,
+      message: err.message,
+    }),
+  };
+}
 
     return {
       statusCode: 200,
