@@ -78,31 +78,16 @@ const jsonHeaders = {
   "Access-Control-Allow-Origin": "*",
 };
 
-// Realistic ceiling on a single payment. Overridable via env var. This is a
-// blast-radius reducer, not a substitute for a real price catalog — it just
-// stops absurd values (the old ceiling let through amounts up to ~99.9 crore).
-const MAX_PAYMENT_AMOUNT = Number(process.env.MAX_PAYMENT_AMOUNT) || 1000000; // ₹10,00,000 default
-
-/**
- * Optional server-side allow-list of valid payment amounts (SG-4356
- * remediation item: "enforce server-side price calculation from
- * authoritative data"). We don't have a price catalog yet, so this is
- * config-driven and OFF by default:
- *   - Unset ALLOWED_PAYMENT_AMOUNTS  -> amount is free-form (donations,
- *     user-chosen amounts); only the sanity bounds above apply.
- *   - Set ALLOWED_PAYMENT_AMOUNTS="100,500,1000,5000" -> only those exact
- *     values are accepted; everything else is rejected with 400.
- * Flip this on the moment a real list/catalog exists — no code change
- * needed, just set the env var.
- */
-const getAllowedAmounts = () => {
-  const raw = process.env.ALLOWED_PAYMENT_AMOUNTS;
-  if (!raw) return null;
-  const parsed = raw
-    .split(",")
-    .map((v) => Number(v.trim()))
-    .filter((v) => !Number.isNaN(v) && v > 0);
-  return parsed.length ? parsed : null;
+// Server-side catalog — amountKey → actual amount in INR
+// Client sends only the key, server resolves the amount. Attacker cannot
+// submit an arbitrary amount — only valid catalog keys are accepted.
+const AMOUNT_CATALOG = {
+  AMT_1:    1,
+  AMT_5:    5,
+  AMT_10:   10,
+  AMT_200:  200,
+  AMT_500:  500,
+  AMT_1000: 1000,
 };
 
 exports.handler = async (event) => {
@@ -140,16 +125,15 @@ exports.handler = async (event) => {
     }
 
     const body = event.body ? JSON.parse(event.body) : {};
-    const { orderId, amount } = body;
-    const parsedAmount = Number(amount);
+    const { orderId, amountKey, sessionToken } = body;
 
-    if (!orderId || !amount) {
+    if (!orderId || !amountKey || !sessionToken) {
       return {
         statusCode: 400,
         headers: jsonHeaders,
         body: JSON.stringify({
           success: false,
-          message: "orderId and amount are required",
+          message: "orderId, amountKey and sessionToken are required",
         }),
       };
     }
@@ -165,42 +149,76 @@ exports.handler = async (event) => {
       };
     }
 
-    if (Number.isNaN(parsedAmount) || parsedAmount <= 0 || parsedAmount > MAX_PAYMENT_AMOUNT) {
+    // Resolve amount from server-side catalog — client cannot supply arbitrary amount
+    const parsedAmount = AMOUNT_CATALOG[amountKey];
+    if (!parsedAmount) {
+      await sendSecurityAlert("INVALID_AMOUNT_KEY", {
+        order_id: orderId,
+        amountKey,
+        source_ip: event.headers?.["x-nf-client-connection-ip"] || event.headers?.["client-ip"] || "unknown",
+      });
       return {
         statusCode: 400,
         headers: jsonHeaders,
         body: JSON.stringify({
           success: false,
-          message: "Invalid amount",
+          message: "Invalid amount selection",
         }),
       };
     }
 
-    // ── Price catalog check (SG-4356 remediation, deferred) ────────────────
-    const allowedAmounts = getAllowedAmounts();
-    if (allowedAmounts) {
-      if (!allowedAmounts.includes(parsedAmount)) {
-        await sendSecurityAlert("AMOUNT_NOT_IN_ALLOWLIST", {
-          order_id: orderId,
-          amount: parsedAmount,
-          source_ip: event.headers?.["x-nf-client-connection-ip"] || event.headers?.["client-ip"] || "unknown",
-        });
-        return {
-          statusCode: 400,
-          headers: jsonHeaders,
-          body: JSON.stringify({
-            success: false,
-            message: "Invalid amount",
-          }),
-        };
-      }
-    } else {
-      // No catalog configured yet. Not blocking — amount is currently
-      // free-form by design — but log it so a real allow-list can be
-      // derived from actual traffic once one is defined.
-      console.log(`ℹ No amount allow-list configured; accepting amount ${parsedAmount} for [${orderId}] unchecked`);
+    // Verify sessionToken exists, is not expired, and amountKey is not already locked
+    if (!admin.apps.length) {
+      return {
+        statusCode: 500,
+        headers: jsonHeaders,
+        body: JSON.stringify({ success: false, message: "Server configuration error" }),
+      };
     }
-    // ── End price catalog check ─────────────────────────────────────────────
+
+    const db = admin.firestore();
+    const sessionDoc = await db.collection("payment_sessions").doc(String(sessionToken)).get();
+
+    if (!sessionDoc.exists) {
+      return {
+        statusCode: 400,
+        headers: jsonHeaders,
+        body: JSON.stringify({ success: false, message: "Invalid or expired session. Please refresh and try again." }),
+      };
+    }
+
+    const sessionData = sessionDoc.data();
+
+    if (sessionData.expiresAt < Date.now()) {
+      await db.collection("payment_sessions").doc(String(sessionToken)).delete();
+      return {
+        statusCode: 400,
+        headers: jsonHeaders,
+        body: JSON.stringify({ success: false, message: "Session expired. Please refresh and try again." }),
+      };
+    }
+
+    // If amountKey already locked to a different value — reject
+    if (sessionData.locked && sessionData.amountKey !== amountKey) {
+      await sendSecurityAlert("AMOUNT_KEY_TAMPER_ATTEMPT", {
+        order_id: orderId,
+        original_amountKey: sessionData.amountKey,
+        attempted_amountKey: amountKey,
+        source_ip: event.headers?.["x-nf-client-connection-ip"] || event.headers?.["client-ip"] || "unknown",
+      });
+      return {
+        statusCode: 400,
+        headers: jsonHeaders,
+        body: JSON.stringify({ success: false, message: "Amount selection cannot be changed. Please refresh and try again." }),
+      };
+    }
+
+    // Lock amountKey to this session — first call wins
+    await db.collection("payment_sessions").doc(String(sessionToken)).update({
+      amountKey,
+      locked: true,
+      orderId: String(orderId),
+    });
 
     const amountHash = generateAmountHash(orderId, parsedAmount);
     const accessToken = generateAccessToken();
