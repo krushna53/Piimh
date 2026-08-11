@@ -30,6 +30,12 @@ status = 200
 force = true
 
 [[redirects]]
+from = "/api/v1/hdfc/lock-amount"
+to = "/.netlify/functions/hdfc-lock-amount"
+status = 200
+force = true
+
+[[redirects]]
 from = "/api/v1/hdfc/init-order"
 to = "/.netlify/functions/hdfc-init-order"
 status = 200
