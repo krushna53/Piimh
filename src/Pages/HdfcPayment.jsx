@@ -52,7 +52,6 @@ const HdfcPaymentForm = () => {
   const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
   const [sessionToken, setSessionToken] = useState(null);
-  const [amountLocked, setAmountLocked] = useState(false);
   const [form, setForm] = useState({
     amountKey: "AMT_1000",
     amount: "1000.00",
@@ -77,8 +76,7 @@ const HdfcPaymentForm = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ sessionToken: d.sessionToken, amountKey: "AMT_1000" }),
         });
-        const lock = await r.json();
-        if (lock.success) setAmountLocked(true);
+        await r.json();
       })
       .catch(() => {});
   }, []);
@@ -87,16 +85,13 @@ const HdfcPaymentForm = () => {
 
   const selectAmount = async ({ value, key }) => {
     setForm((prev) => ({ ...prev, amount: value, amountKey: key }));
-    setAmountLocked(false);
     if (!sessionToken) return;
     try {
-      const r = await fetch("/api/v1/hdfc/lock-amount", {
+      await fetch("/api/v1/hdfc/lock-amount", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionToken, amountKey: key }),
       });
-      const d = await r.json();
-      if (d.success) setAmountLocked(true);
     } catch (_) {}
   };
   const formatAmount = (val) => {
@@ -237,8 +232,8 @@ const HdfcPaymentForm = () => {
           <span style={styles.totalAmount}>{formatAmount(form.amount)}</span>
         </div>
 
-        <button style={styles.payBtn(loading || !amountLocked)} onClick={startPayment} disabled={loading || !amountLocked}>
-          {loading ? "Processing..." : !amountLocked ? "Confirming amount..." : `Pay ${formatAmount(form.amount)} securely`}
+        <button style={styles.payBtn(loading)} onClick={startPayment} disabled={loading}>
+          {loading ? "Processing..." : `Pay ${formatAmount(form.amount)} securely`}
         </button>
 
         <div style={styles.security}>
