@@ -53,8 +53,8 @@ const HdfcPaymentForm = () => {
   const [focusedField, setFocusedField] = useState(null);
   const [sessionToken, setSessionToken] = useState(null);
   const [form, setForm] = useState({
-    amountKey: "AMT_1000",
-    amount: "1000.00",
+    amountKey: "AMT_1",
+    amount: "1.00",
     customerId: "CUST_" + uuidv4(),
     customerEmail: "",
     customerPhone: "",
@@ -63,26 +63,25 @@ const HdfcPaymentForm = () => {
     lastName: "",
   });
 
-  // Get sessionToken and lock default amount on page load
+  // Get sessionToken on page load and lock default amount
   React.useEffect(() => {
     fetch("/api/v1/hdfc/init-session", { method: "POST", headers: { "Content-Type": "application/json" } })
       .then((r) => r.json())
       .then(async (d) => {
         if (!d.success) return;
         setSessionToken(d.sessionToken);
-        // Lock the default selected amount immediately
-        const r = await fetch("/api/v1/hdfc/lock-amount", {
+        await fetch("/api/v1/hdfc/lock-amount", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionToken: d.sessionToken, amountKey: "AMT_1000" }),
+          body: JSON.stringify({ sessionToken: d.sessionToken, amountKey: "AMT_1" }),
         });
-        await r.json();
       })
       .catch(() => {});
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+  // Update lock on server whenever user changes amount selection
   const selectAmount = async ({ value, key }) => {
     setForm((prev) => ({ ...prev, amount: value, amountKey: key }));
     if (!sessionToken) return;
