@@ -69,12 +69,7 @@ exports.handler = async (event) => {
       if (!doc.exists) return { ok: false, reason: "Invalid or expired session" };
       if (doc.data().expiresAt < Date.now()) return { ok: false, reason: "Session expired" };
 
-      // Already locked to a different key — tamper attempt
-      if (doc.data().locked && doc.data().amountKey !== amountKey) {
-        return { ok: false, reason: "tamper", original: doc.data().amountKey };
-      }
-
-      // Lock or update (user changed selection before Pay)
+      // Always update — user can freely change selection until Pay is clicked
       tx.update(sessionRef, { amountKey, locked: true });
       return { ok: true };
     });
