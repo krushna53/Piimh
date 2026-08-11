@@ -3,12 +3,12 @@ import { v4 as uuidv4 } from "uuid";
 import "aos/dist/aos.css";
 
 const AMOUNTS = [
-  { label: "₹1", value: "1.00" },
-  { label: "₹5", value: "5.00" },
-  { label: "₹10", value: "10.00" },
-  { label: "₹200", value: "200.00" },
-  { label: "₹500", value: "500.00" },
-  { label: "₹1,000", value: "1000.00" },
+  { label: "₹1",     value: "1.00",    key: "AMT_1"    },
+  { label: "₹5",     value: "5.00",    key: "AMT_5"    },
+  { label: "₹10",    value: "10.00",   key: "AMT_10"   },
+  { label: "₹200",   value: "200.00",  key: "AMT_200"  },
+  { label: "₹500",   value: "500.00",  key: "AMT_500"  },
+  { label: "₹1,000", value: "1000.00", key: "AMT_1000" },
 ];
 
 const styles = {
@@ -51,19 +51,28 @@ const LockIcon = () => (
 const HdfcPaymentForm = () => {
   const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  const [sessionToken, setSessionToken] = useState(null);
   const [form, setForm] = useState({
+    amountKey: "AMT_1000",
     amount: "1000.00",
     customerId: "CUST_" + uuidv4(),
     customerEmail: "",
     customerPhone: "",
-    // orderId is generated fresh each attempt to prevent duplicate submissions
     orderId: uuidv4().replace(/-/g, "").slice(0, 20),
     firstName: "",
     lastName: "",
   });
 
+  // Get sessionToken from server on page load
+  React.useEffect(() => {
+    fetch("/api/v1/hdfc/init-session", { method: "POST", headers: { "Content-Type": "application/json" } })
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setSessionToken(d.sessionToken); })
+      .catch(() => {});
+  }, []);
+
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const selectAmount = (value) => setForm({ ...form, amount: value });
+  const selectAmount = ({ value, key }) => setForm({ ...form, amount: value, amountKey: key });
   const formatAmount = (val) => {
     const num = parseFloat(val || "0");
     return "₹" + num.toLocaleString("en-IN");
@@ -82,11 +91,15 @@ const HdfcPaymentForm = () => {
       const amount = parseFloat(form.amount);
       const orderId = form.orderId;
 
-      // #2 — Step 1: Register amount server-side to prevent tampering; get back amountHash
+      if (!sessionToken) {
+        return alert("Session not ready. Please refresh the page and try again.");
+      }
+
+      // Step 1: Send amountKey + sessionToken — server resolves amount from catalog and locks it to session
       const initRes = await fetch("/api/v1/hdfc/init-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, amount }),
+        body: JSON.stringify({ orderId, amountKey: form.amountKey, sessionToken }),
       });
       const initData = await initRes.json();
 
@@ -166,8 +179,8 @@ const HdfcPaymentForm = () => {
         <div style={{ marginBottom: 28 }}>
           <p style={styles.sectionLabel}>Select amount</p>
           <div style={styles.amountGrid}>
-            {AMOUNTS.map(({ label, value }) => (
-              <button key={value} style={styles.amtBtn(form.amount === value)} onClick={() => selectAmount(value)}>{label}</button>
+            {AMOUNTS.map(({ label, value, key }) => (
+              <button key={key} style={styles.amtBtn(form.amountKey === key)} onClick={() => selectAmount({ value, key })}>{label}</button>
             ))}
           </div>
         </div>
