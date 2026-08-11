@@ -72,7 +72,19 @@ const HdfcPaymentForm = () => {
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const selectAmount = ({ value, key }) => setForm({ ...form, amount: value, amountKey: key });
+
+  const selectAmount = async ({ value, key }) => {
+    setForm({ ...form, amount: value, amountKey: key });
+    if (!sessionToken) return;
+    // Lock amountKey on server immediately when user clicks — before Pay button
+    try {
+      await fetch("/api/v1/hdfc/lock-amount", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionToken, amountKey: key }),
+      });
+    } catch (_) {}
+  };
   const formatAmount = (val) => {
     const num = parseFloat(val || "0");
     return "₹" + num.toLocaleString("en-IN");

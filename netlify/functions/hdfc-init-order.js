@@ -1,6 +1,5 @@
 const crypto = require("crypto");
 const admin = require("firebase-admin");
-const { sendSecurityAlert } = require("./lib/security-alert");
 
 if (!admin.apps.length) {
   try {
@@ -149,25 +148,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // Resolve amount from server-side catalog — client cannot supply arbitrary amount
-    const parsedAmount = AMOUNT_CATALOG[amountKey];
-    if (!parsedAmount) {
-      await sendSecurityAlert("INVALID_AMOUNT_KEY", {
-        order_id: orderId,
-        amountKey,
-        source_ip: event.headers?.["x-nf-client-connection-ip"] || event.headers?.["client-ip"] || "unknown",
-      });
-      return {
-        statusCode: 400,
-        headers: jsonHeaders,
-        body: JSON.stringify({
-          success: false,
-          message: "Invalid amount selection",
-        }),
-      };
-    }
-
-    // Verify sessionToken exists, is not expired, and amountKey is not already locked
+    // Verify sessionToken and read the server-locked amountKey — ignore client-supplied amountKey
     if (!admin.apps.length) {
       return {
         statusCode: 500,
@@ -198,25 +179,28 @@ exports.handler = async (event) => {
       };
     }
 
-    // If amountKey already locked to a different value — reject
-    if (sessionData.locked && sessionData.amountKey !== amountKey) {
-      await sendSecurityAlert("AMOUNT_KEY_TAMPER_ATTEMPT", {
-        order_id: orderId,
-        original_amountKey: sessionData.amountKey,
-        attempted_amountKey: amountKey,
-        source_ip: event.headers?.["x-nf-client-connection-ip"] || event.headers?.["client-ip"] || "unknown",
-      });
+    if (!sessionData.locked || !sessionData.amountKey) {
       return {
         statusCode: 400,
         headers: jsonHeaders,
-        body: JSON.stringify({ success: false, message: "Amount selection cannot be changed. Please refresh and try again." }),
+        body: JSON.stringify({ success: false, message: "Please select an amount before proceeding." }),
       };
     }
 
-    // Lock amountKey to this session — first call wins
+    // Use the server-locked amountKey — completely ignore client-supplied amountKey
+    const lockedAmountKey = sessionData.amountKey;
+    const parsedAmount = AMOUNT_CATALOG[lockedAmountKey];
+
+    if (!parsedAmount) {
+      return {
+        statusCode: 400,
+        headers: jsonHeaders,
+        body: JSON.stringify({ success: false, message: "Invalid amount selection" }),
+      };
+    }
+
+    // Bind orderId to session so create-session can verify it too
     await db.collection("payment_sessions").doc(String(sessionToken)).update({
-      amountKey,
-      locked: true,
       orderId: String(orderId),
     });
 
